@@ -1,0 +1,150 @@
+.error-boundary-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+}
+
+.error-boundary-content {
+    background: white;
+    border-radius: 20px;
+    padding: 60px 40px;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.error-boundary-content h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.error-message {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.error-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-actions button {
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-secondary {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.error-details {
+    margin-top: 30px;
+    text-align: left;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.error-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #dc3545;
+    margin-bottom: 10px;
+    user-select: none;
+}
+
+.error-details pre {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.5;
+    border-left: 4px solid #dc3545;
+    margin: 10px 0 0 0;
+}
+
+@media (max-width: 768px) {
+    .error-boundary-content {
+        padding: 40px 20px;
+    }
+
+    .error-boundary-content h1 {
+        font-size: 24px;
+    }
+
+    .error-message {
+        font-size: 16px;
+    }
+
+    .error-actions {
+        flex-direction: column;
+    }
+
+    .error-actions button {
+        width: 100%;
+    }
+}

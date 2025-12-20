@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Live Disaster Map Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#1775d3",
+              "background-light": "#f6f7f8",
+              "background-dark": "#111418",
+            },
+            fontFamily: {
+              "display": ["Public Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display">
+<div class="relative flex h-screen w-full flex-col group/design-root overflow-hidden">
+<!-- Top Nav Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#293038] px-10 py-3 z-20 bg-background-dark/80 backdrop-blur-sm">
+<div class="flex items-center gap-4 text-white">
+<div class="size-6 text-primary">
+<svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 35.9988 39.5563 34.1455Z"></path>
+<path clip-rule="evenodd" d="M10.4485 13.8519C10.4749 13.9271 10.6203 14.246 11.379 14.7361C12.298 15.3298 13.7492 15.9145 15.6717 16.3735C18.0007 16.9296 20.8712 17.2655 24 17.2655C27.1288 17.2655 29.9993 16.9296 32.3283 16.3735C34.2508 15.9145 35.702 15.3298 36.621 14.7361C37.3796 14.246 37.5251 13.9271 37.5515 13.8519C37.5287 13.7876 37.4333 13.5973 37.0635 13.2931C36.5266 12.8516 35.6288 12.3647 34.343 11.9175C31.79 11.0295 28.1333 10.4437 24 10.4437C19.8667 10.4437 16.2099 11.0295 13.657 11.9175C12.3712 12.3647 11.4734 12.8516 10.9365 13.2931C10.5667 13.5973 10.4713 13.7876 10.4485 13.8519ZM37.5563 18.7877C36.3176 19.3925 34.8502 19.8839 33.2571 20.2642C30.5836 20.9025 27.3973 21.2655 24 21.2655C20.6027 21.2655 17.4164 20.9025 14.7429 20.2642C13.1498 19.8839 11.6824 19.3925 10.4436 18.7877V34.1275C10.4515 34.1545 10.5427 34.4867 11.379 35.027C12.298 35.6207 13.7492 36.2054 15.6717 36.6644C18.0007 37.2205 20.8712 37.5564 24 37.5564C27.1288 37.5564 29.9993 37.2205 32.3283 36.6644C34.2508 36.2054 35.702 35.6207 36.621 35.027C37.4573 34.4867 37.5485 34.1546 37.5563 34.1275V18.7877ZM41.5563 13.8546V34.1455C41.5563 36.1078 40.158 37.5042 38.7915 38.3869C37.3498 39.3182 35.4192 40.0389 33.2571 40.5551C30.5836 41.1934 27.3973 41.5564 24 41.5564C20.6027 41.5564 17.4164 41.1934 14.7429 40.5551C12.5808 40.0389 10.6502 39.3182 9.20848 38.3869C7.84205 37.5042 6.44365 36.1078 6.44365 34.1455L6.44365 13.8546C6.44365 12.2684 7.37223 11.0454 8.39581 10.2036C9.43325 9.3505 10.8137 8.67141 12.343 8.13948C15.4203 7.06909 19.5418 6.44366 24 6.44366C28.4582 6.44366 32.5797 7.06909 35.657 8.13948C37.1863 8.67141 38.5667 9.3505 39.6042 10.2036C40.6278 11.0454 41.5563 12.2684 41.5563 13.8546Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">DisasterRescue</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-primary text-sm font-bold leading-normal relative py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary" href="#">Map Dashboard</a>
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">Relief Network</a>
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">Safety Guide</a>
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">Live News</a>
+</div>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+<span class="truncate">Login/Signup</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Left Sidebar -->
+<aside class="w-[360px] flex-shrink-0 bg-[#161a21] border-r border-[#293038] flex flex-col p-4 overflow-y-auto">
+<div class="flex flex-col gap-6">
+<!-- Stats Section -->
+<div>
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-2 pb-3">Live Statistics</h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-4 border border-[#3c4753] hover:border-primary/50 transition-colors cursor-pointer">
+<p class="text-white/80 text-base font-medium leading-normal">Total Alerts</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">152</p>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-4 border border-[#3c4753] hover:border-red-500/50 transition-colors cursor-pointer">
+<p class="text-red-400 text-base font-medium leading-normal">Critical</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">12</p>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-4 border border-[#3c4753] hover:border-orange-500/50 transition-colors cursor-pointer">
+<p class="text-orange-400 text-base font-medium leading-normal">High Risk</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">45</p>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-4 border border-[#3c4753] hover:border-green-500/50 transition-colors cursor-pointer">
+<p class="text-green-400 text-base font-medium leading-normal">Active Now</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">89</p>
+</div>
+</div>
+</div>
+<!-- Map Layers Section -->
+<div>
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-2 pb-2">Map Layers</h3>
+<div class="px-2" style="--checkbox-tick-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(255,255,255)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e');">
+<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
+<input checked="" class="h-5 w-5 rounded border-[#3c4753] border-2 bg-transparent text-primary checked:bg-primary checked:border-primary checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#3c4753] focus:outline-none" type="checkbox"/>
+<p class="text-white text-base font-normal leading-normal">Disasters</p>
+</label>
+<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
+<input checked="" class="h-5 w-5 rounded border-[#3c4753] border-2 bg-transparent text-primary checked:bg-primary checked:border-primary checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#3c4753] focus:outline-none" type="checkbox"/>
+<p class="text-white text-base font-normal leading-normal">Weather</p>
+</label>
+<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
+<input class="h-5 w-5 rounded border-[#3c4753] border-2 bg-transparent text-primary checked:bg-primary checked:border-primary checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#3c4753] focus:outline-none" type="checkbox"/>
+<p class="text-white text-base font-normal leading-normal">Shelters</p>
+</label>
+</div>
+</div>
+<!-- Latest Alerts Section -->
+<div class="flex flex-col gap-2">
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-2 pb-2">Latest Alerts</h3>
+<div class="flex flex-col gap-1">
+<!-- Alert Item -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer">
+<span class="w-2.5 h-2.5 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></span>
+<div>
+<p class="text-white font-medium text-sm leading-snug">Cyclone Alert - Odisha Coast</p>
+<p class="text-white/50 text-xs">2 min ago</p>
+</div>
+</div>
+<!-- Alert Item -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer">
+<span class="w-2.5 h-2.5 rounded-full bg-orange-500 mt-1.5 flex-shrink-0"></span>
+<div>
+<p class="text-white font-medium text-sm leading-snug">Heavy Rainfall Warning - Kerala</p>
+<p class="text-white/50 text-xs">15 min ago</p>
+</div>
+</div>
+<!-- Alert Item -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer bg-primary/20 border border-primary/50">
+<span class="w-2.5 h-2.5 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></span>
+<div>
+<p class="text-white font-medium text-sm leading-snug">Earthquake Alert - Gujarat</p>
+<p class="text-white/50 text-xs">32 min ago</p>
+</div>
+</div>
+<!-- Alert Item -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer">
+<span class="w-2.5 h-2.5 rounded-full bg-orange-500 mt-1.5 flex-shrink-0"></span>
+<div>
+<p class="text-white font-medium text-sm leading-snug">Flash Flood Watch - Uttarakhand</p>
+<p class="text-white/50 text-xs">48 min ago</p>
+</div>
+</div>
+<!-- Alert Item -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer">
+<span class="w-2.5 h-2.5 rounded-full bg-gray-500 mt-1.5 flex-shrink-0"></span>
+<div>
+<p class="text-white font-medium text-sm leading-snug">Heatwave Advisory - Rajasthan</p>
+<p class="text-white/50 text-xs">1 hour ago</p>
+</div>
+</div>
+<!-- More items... -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer">
+<span class="w-2.5 h-2.5 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></span>
+<div>
+<p class="text-white font-medium text-sm leading-snug">Landslide Warning - Himachal</p>
+<p class="text-white/50 text-xs">2 hours ago</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer">
+<span class="w-2.5 h-2.5 rounded-full bg-orange-500 mt-1.5 flex-shrink-0"></span>
+<div>
+<p class="text-white font-medium text-sm leading-snug">Severe Thunderstorm Alert</p>
+<p class="text-white/50 text-xs">3 hours ago</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content: Map -->
+<main class="flex-1 relative bg-[#0c0f12]">
+<img alt="Interactive map of India showing various disaster alert markers, with a focus on cyclone tracking over the Bay of Bengal." class="absolute inset-0 w-full h-full object-cover" data-location="India" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw81Ft_iniXwsOh6czcYChQ4TZYu0XcrRmIAlqjW63dP-Ho2O7cZLfwfu5Da8kBsnhNMOB57BxD8K-qJlYIf5eCDcLTOHyFy-ZY8cFKtu61s01b9Qj80J96xmxQ4fE9POviMlQwt_rqJVsrAM5xX5fFkQcYnNoxe1vljfZ_aIPaEUQXjisxQ1y5FktiEezG_cEtUpBpGyuOVRPX6mS530o-PS7gQYXHch8pXkcjIZt5O09e43vdAIdU9JF7AT7MdiPG4V-Rc6JYR9z"/>
+</main>
+<!-- Slide-out Details Panel (Initially hidden) -->
+<aside class="absolute top-0 right-0 h-full w-[400px] bg-[#161a21]/90 backdrop-blur-md border-l border-[#293038] p-6 flex flex-col gap-6 z-10 translate-x-0 transition-transform duration-300 ease-in-out">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold text-white">Earthquake Alert</h2>
+<button class="text-white/50 hover:text-white transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-white/5 p-4 rounded-lg">
+<p class="text-sm text-white/60 mb-1">Severity</p>
+<p class="text-lg font-bold text-red-400">Critical</p>
+</div>
+<div class="bg-white/5 p-4 rounded-lg">
+<p class="text-sm text-white/60 mb-1">Location</p>
+<p class="text-lg font-medium text-white">Bhuj, Gujarat</p>
+<p class="text-sm text-white/60">23.2536° N, 69.6603° E</p>
+</div>
+<div class="bg-white/5 p-4 rounded-lg">
+<p class="text-sm text-white/60 mb-1">Timestamp</p>
+<p class="text-lg font-medium text-white">Oct 26, 2023, 14:32:15 IST</p>
+</div>
+<div class="bg-white/5 p-4 rounded-lg">
+<p class="text-sm text-white/60 mb-1">Description</p>
+<p class="text-base text-white/90 leading-relaxed">A magnitude 6.9 earthquake has been reported near Bhuj. Strong tremors felt across the region. Residents are advised to move to open spaces, away from buildings. Emergency services have been dispatched.</p>
+</div>
+</div>
+<div class="mt-auto flex gap-4">
+<button class="flex-1 flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-base">share</span>
+<span class="truncate">Share Alert</span>
+</button>
+<button class="flex-1 flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-4 bg-white/10 text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/20 transition-colors">
+<span class="material-symbols-outlined text-base">campaign</span>
+<span class="truncate">Request Aid</span>
+</button>
+</div>
+</aside>
+</div>
+</div>
+</body></html>

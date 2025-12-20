@@ -1,0 +1,121 @@
+/* Header.css */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 2.5rem;
+    z-index: 1000;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    position: sticky;
+    top: 0;
+    width: 100%;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-white);
+}
+
+.header-logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    filter: drop-shadow(0 0 12px var(--accent-glow));
+}
+
+.header-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--text-white);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.nav-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--text-white);
+}
+
+.nav-link.active {
+    color: var(--text-white);
+    font-weight: 600;
+}
+
+.active-tab-indicator {
+    position: absolute;
+    bottom: -0.75rem;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-gradient);
+    border-radius: 4px 4px 0 0;
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.header-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    height: 2.5rem;
+    padding: 0 1.25rem;
+    background: var(--accent-gradient);
+    color: var(--text-white);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    transition: all 0.2s ease;
+}
+
+.header-login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.header-login-btn.logout {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-bright);
+}
+
+.header-login-btn.logout:hover {
+    background: rgba(255, 255, 255, 0.1);
+}

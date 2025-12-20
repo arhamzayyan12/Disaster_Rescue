@@ -1,0 +1,78 @@
+.news-ticker-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    z-index: 2000;
+    overflow: hidden;
+    user-select: none;
+}
+
+.ticker-label {
+    background: var(--accent-gradient);
+    color: white;
+    height: 100%;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    z-index: 2;
+    box-shadow: 10px 0 20px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+.ticker-label span {
+    font-size: 18px;
+}
+
+.ticker-track {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.ticker-content {
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+}
+
+.ticker-item {
+    padding: 0 2.5rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ticker-bullet {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.ticker-item.clickable {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.ticker-item.clickable:hover {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.05);
+}

@@ -1,0 +1,312 @@
+/* LiveNews.css - Obsidian Tech Theme v3.0 */
+.live-news-container {
+    height: 100%;
+    overflow-y: auto;
+    background: var(--bg-dark);
+}
+
+.intelligence-header {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.intelligence-header .header-title {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+}
+
+.intelligence-header .text-muted {
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+.layout-content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+/* Stats Row */
+.stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.news-stat-card {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.75rem;
+    border-radius: 24px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+}
+
+.news-stat-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-bright);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.news-stat-label {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.news-stat-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1;
+}
+
+.news-stat-card:nth-child(1) .news-stat-value {
+    color: var(--primary);
+}
+
+.news-stat-card:nth-child(2) .news-stat-value {
+    color: var(--status-critical);
+}
+
+.news-stat-card:nth-child(3) .news-stat-value {
+    color: var(--status-low);
+}
+
+/* Filters Row */
+.filters-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .filters-row {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+.search-container {
+    flex: 1;
+}
+
+.search-wrapper {
+    display: flex;
+    height: 3.5rem;
+    align-items: center;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    transition: all 0.3s;
+}
+
+.search-wrapper:focus-within {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.search-icon-wrapper {
+    padding-left: 1.25rem;
+    color: var(--text-muted);
+}
+
+.search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-white);
+    font-size: 1rem;
+    padding: 0 1rem;
+    outline: none;
+}
+
+.filter-pills {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.filter-pill {
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border-subtle);
+}
+
+.filter-pill.active {
+    background: var(--accent-gradient);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.filter-pill.inactive {
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-secondary);
+}
+
+.filter-pill.inactive:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border-bright);
+}
+
+/* News List */
+.news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.news-card {
+    background: var(--bg-card);
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-subtle);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.news-card:hover {
+    transform: scale(1.01);
+    border-color: var(--border-bright);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+@media (min-width: 1024px) {
+    .news-card {
+        flex-direction: row;
+        height: 240px;
+    }
+}
+
+.news-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.news-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(2, 6, 23, 0.4), transparent);
+}
+
+@media (min-width: 1024px) {
+    .news-image {
+        width: 360px;
+        height: 100%;
+    }
+}
+
+.news-content {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.news-meta-info {
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.news-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-white);
+    line-height: 1.3;
+}
+
+.news-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.news-actions {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.severity-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.severity-badge.critical {
+    background: var(--critical-gradient);
+    color: white;
+}
+
+.severity-badge.high {
+    background: var(--status-high);
+    color: white;
+}
+
+.severity-badge.medium {
+    background: var(--status-medium);
+    color: white;
+}
+
+.severity-badge.low {
+    background: var(--success-gradient);
+    color: white;
+}
+
+.view-details-btn {
+    height: 2.5rem;
+    padding: 0 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-weight: 600;
+    border-radius: 12px;
+    border: 1px solid var(--border-bright);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-details-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary-glow);
+}

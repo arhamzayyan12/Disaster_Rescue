@@ -1,0 +1,412 @@
+/* QR Code Display Modal Styles */
+
+.qr-display-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.qr-display-modal-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border-radius: 20px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    position: relative;
+    animation: slideUp 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Header */
+.qr-display-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(33, 150, 243, 0.05);
+}
+
+.qr-display-modal-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 4px;
+}
+
+.request-victim-name {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.qr-display-modal-close {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.qr-display-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+/* Request Details */
+.qr-display-request-details {
+    padding: 24px 28px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.detail-row.full-width {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.detail-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+.detail-value.amount {
+    font-size: 20px;
+    color: #4CAF50;
+    font-weight: 700;
+}
+
+.detail-value.urgency {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.detail-value.urgency.critical {
+    background: rgba(156, 39, 176, 0.2);
+    color: #CE93D8;
+    border: 1px solid rgba(156, 39, 176, 0.4);
+}
+
+.detail-value.urgency.high {
+    background: rgba(244, 67, 54, 0.2);
+    color: #EF5350;
+    border: 1px solid rgba(244, 67, 54, 0.4);
+}
+
+.detail-value.urgency.medium {
+    background: rgba(255, 152, 0, 0.2);
+    color: #FFB74D;
+    border: 1px solid rgba(255, 152, 0, 0.4);
+}
+
+.detail-description {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* QR Display Section */
+.qr-display-section {
+    padding: 28px;
+}
+
+.qr-display-instructions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(33, 150, 243, 0.1);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.qr-display-instructions .material-symbols-outlined {
+    font-size: 32px;
+    color: #2196F3;
+}
+
+.qr-display-instructions p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.qr-display-image-container {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.qr-display-image {
+    max-width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+    display: block;
+}
+
+.qr-display-upi-info {
+    margin-bottom: 20px;
+}
+
+.upi-id-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 10px;
+}
+
+.upi-id-display .material-symbols-outlined {
+    font-size: 24px;
+    color: #4CAF50;
+}
+
+.upi-id-text {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-family: 'Courier New', monospace;
+}
+
+.qr-display-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.qr-display-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.qr-display-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.qr-display-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.qr-display-btn.primary {
+    background: #2196F3;
+    color: white;
+}
+
+.qr-display-btn.primary:hover {
+    background: #1976D2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.qr-display-btn .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.qr-display-disclaimer {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 12px;
+}
+
+.qr-display-disclaimer .material-symbols-outlined {
+    font-size: 24px;
+    color: #FFB74D;
+    flex-shrink: 0;
+}
+
+.disclaimer-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFB74D;
+    margin: 0 0 4px;
+}
+
+.disclaimer-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* No QR Code State */
+.qr-display-no-qr {
+    padding: 60px 28px;
+    text-align: center;
+}
+
+.qr-display-no-qr .material-symbols-outlined {
+    font-size: 80px;
+    color: rgba(255, 255, 255, 0.2);
+    margin-bottom: 16px;
+}
+
+.qr-display-no-qr p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 8px;
+}
+
+.no-qr-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Footer */
+.qr-display-modal-footer {
+    padding: 20px 28px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.qr-display-modal-footer .qr-display-btn {
+    flex: 0 0 auto;
+    min-width: 120px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .qr-display-modal-content {
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+        max-height: 95vh;
+    }
+
+    .qr-display-modal-header {
+        padding: 20px;
+    }
+
+    .qr-display-modal-header h2 {
+        font-size: 20px;
+    }
+
+    .qr-display-request-details {
+        padding: 20px;
+    }
+
+    .qr-display-section {
+        padding: 20px;
+    }
+
+    .qr-display-image-container {
+        padding: 16px;
+    }
+
+    .qr-display-image {
+        max-height: 280px;
+    }
+
+    .qr-display-actions {
+        flex-direction: column;
+    }
+
+    .qr-display-btn {
+        width: 100%;
+    }
+
+    .qr-display-modal-footer {
+        padding: 16px 20px;
+    }
+
+    .qr-display-modal-footer .qr-display-btn {
+        width: 100%;
+    }
+}
+
+/* Accessibility */
+.qr-display-btn:focus,
+.qr-display-modal-close:focus {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
+}
+
+/* Smooth Scrolling */
+.qr-display-modal-content {
+    scroll-behavior: smooth;
+}
+
+.qr-display-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.qr-display-modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.qr-display-modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.qr-display-modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
