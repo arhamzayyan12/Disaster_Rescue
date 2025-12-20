@@ -6,6 +6,7 @@ export interface User {
     id: string
     name: string
     email: string
+    avatarUrl?: string
     role: 'victim' | 'volunteer'
     createdAt: string
 }
@@ -13,18 +14,9 @@ export interface User {
 interface AuthContextType {
     user: User | null
     isAuthenticated: boolean
-    login: (email: string, password: string) => Promise<boolean>
-    signup: (userData: SignupData) => Promise<boolean>
-    logout: () => void
-    updateProfile: (userData: Partial<User>) => void
+    signInWithGoogle: () => Promise<void>
+    logout: () => Promise<void>
     loading: boolean
-}
-
-export interface SignupData {
-    name: string
-    email: string
-    password: string
-    role: 'victim' | 'volunteer'
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -50,9 +42,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (!supabaseUser) return null
         return {
             id: supabaseUser.id,
-            name: supabaseUser.user_metadata?.name || 'User',
+            name: supabaseUser.user_metadata?.name || supabaseUser.user_metadata?.full_name || 'User',
             email: supabaseUser.email || '',
-            role: supabaseUser.user_metadata?.role || 'victim',
+            avatarUrl: supabaseUser.user_metadata?.avatar_url,
+            // Default to volunteer if not specified, user can toggle in dashboard
+            role: supabaseUser.user_metadata?.role || 'volunteer',
             createdAt: supabaseUser.created_at
         }
     }
@@ -79,49 +73,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return () => subscription.unsubscribe()
     }, [])
 
-    const signup = async (userData: SignupData): Promise<boolean> => {
+    const signInWithGoogle = async () => {
         try {
-            const { data, error } = await supabase.auth.signUp({
-                email: userData.email,
-                password: userData.password,
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
                 options: {
-                    data: {
-                        name: userData.name,
-                        role: userData.role
-                    }
-                }
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
+                    redirectTo: window.location.origin, // Redirects back to the current domain
+                },
             })
-
             if (error) throw error
-
-            if (data.user) {
-                setUser(mapUser(data.user))
-                return true
-            }
-            return false
         } catch (error) {
-            console.error('Signup failed:', error)
-            return false
-        }
-    }
-
-    const login = async (email: string, password: string): Promise<boolean> => {
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            })
-
-            if (error) throw error
-
-            if (data.user) {
-                setUser(mapUser(data.user))
-                return true
-            }
-            return false
-        } catch (error) {
-            console.error('Login failed:', error)
-            return false
+            console.error('Google login failed:', error)
+            throw error
         }
     }
 
@@ -135,34 +102,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }
 
-    const updateProfile = async (userData: Partial<User>) => {
-        if (!user) return
-
-        try {
-            const { data, error } = await supabase.auth.updateUser({
-                data: {
-                    name: userData.name,
-                    role: userData.role
-                }
-            })
-
-            if (error) throw error
-
-            if (data.user) {
-                setUser(mapUser(data.user))
-            }
-        } catch (error) {
-            console.error('Update profile failed:', error)
-        }
-    }
-
     const value: AuthContextType = {
         user,
         isAuthenticated: !!user,
-        login,
-        signup,
+        signInWithGoogle,
         logout,
-        updateProfile,
         loading
     }
 

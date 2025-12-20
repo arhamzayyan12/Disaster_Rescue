@@ -20,7 +20,6 @@ interface SidebarProps {
     onAlertClick: (disaster: Disaster) => void
     activeFilter: string
     onStatClick: (filter: string) => void
-    onOpenStats: () => void
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -30,8 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     recentAlerts,
     onAlertClick,
     activeFilter,
-    onStatClick,
-    onOpenStats
+    onStatClick
 }) => {
     const formatTimeAgo = (dateStr: string) => {
         const date = new Date(dateStr)
@@ -54,15 +52,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                             <h3>Global Status Monitor</h3>
                             <span className="text-[10px] text-muted uppercase tracking-widest -mt-1 font-bold">Resilience & Response Index</span>
                         </div>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 bg-blue-500/10 px-2 py-1 rounded transition-colors"
-                            onClick={onOpenStats}
-                        >
-                            <span className="material-symbols-outlined text-sm">hub</span>
-                            Command Center
-                        </motion.button>
                     </div>
                     <div className="stats-grid">
                         {[

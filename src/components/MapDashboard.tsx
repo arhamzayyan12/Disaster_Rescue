@@ -6,7 +6,6 @@ import { AnimatePresence } from 'framer-motion'
 
 // Lazy load DisasterMap to reduce initial bundle size (Leaflet is heavy)
 const DisasterMap = lazy(() => import('./DisasterMap'))
-const DisasterStatsModal = lazy(() => import('./DisasterStatsModal'))
 
 interface MapDashboardProps {
     disasters: Disaster[]
@@ -88,8 +87,6 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
 
     const [activeFilter, setActiveFilter] = React.useState<string>('total')
 
-    const [isStatsOpen, setIsStatsOpen] = React.useState(false)
-
     // Calculate stats
     const stats = React.useMemo(() => {
         return {
@@ -123,7 +120,6 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
                 onAlertClick={onDisasterSelect}
                 activeFilter={activeFilter}
                 onStatClick={handleStatClick}
-                onOpenStats={() => setIsStatsOpen(true)}
             />
             <div style={{ flex: 1, position: 'relative' }}>
                 <Suspense fallback={<MapLoading />}>
@@ -137,19 +133,6 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
                     />
                 </Suspense>
             </div>
-
-            {/* Lazy load the modal too if possible, but for now standard import or just conditional render is fine. 
-                We will use React.lazy for it as an optimization since it is an interaction-only component.
-            */}
-            <React.Suspense fallback={null}>
-                {isStatsOpen && (
-                    <DisasterStatsModal
-                        isOpen={isStatsOpen}
-                        onClose={() => setIsStatsOpen(false)}
-                        disasters={disasters}
-                    />
-                )}
-            </React.Suspense>
 
             <AnimatePresence>
                 {showHub && (

@@ -7,7 +7,6 @@ import {
     fulfillRequest
 } from '../services/relief-service'
 import ReliefMap from './ReliefMap'
-import QRCodeUpload from './QRCodeUpload'
 import QRCodeDisplayModal from './QRCodeDisplayModal'
 import { useToast } from './Toast'
 import { useAuth } from '../contexts/AuthContext'
@@ -84,9 +83,7 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
         return req.status === filter
     })
 
-    const isValidUPI = (id: string) => {
-        return /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(id)
-    }
+
 
     const handleSubmitRequest = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -96,10 +93,7 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
         }
 
         if (formData.type === 'monetary') {
-            if (!isValidUPI(formData.upiId)) {
-                toast.error('Invalid UPI ID format')
-                return
-            }
+
             if (parseInt(formData.amount) <= 0) {
                 toast.error('Amount must be greater than 0')
                 return
@@ -248,7 +242,7 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
                                     <div className="form-section">
                                         <h2 className="form-section-title">Financial Details</h2>
                                         <div className="input-padding">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 gap-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-400 mb-1">Amount Required (INR)</label>
                                                     <input
@@ -264,32 +258,21 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
                                                         required={formData.type === 'monetary'}
                                                     />
                                                 </div>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-400 mb-1">Your UPI ID</label>
-                                                    <input
-                                                        className="text-input"
-                                                        placeholder="username@bank"
-                                                        value={formData.upiId}
-                                                        onChange={e => setFormData({ ...formData, upiId: e.target.value })}
-                                                        required={formData.type === 'monetary'}
-                                                    />
-                                                </div>
                                             </div>
 
-                                            {/* QR Code Upload */}
+                                            {/* QR Code Display (Permanent) */}
                                             <div className="mt-4">
                                                 <label className="block text-sm font-medium text-gray-400 mb-2">
-                                                    Upload UPI QR Code (Google Pay / PhonePe / Paytm)
+                                                    Scan to Donate
                                                 </label>
-                                                <QRCodeUpload
-                                                    onImageUpload={(base64Image) => {
-                                                        setFormData({ ...formData, qrCodeImage: base64Image })
-                                                    }}
-                                                    onImageRemove={() => {
-                                                        setFormData({ ...formData, qrCodeImage: '' })
-                                                    }}
-                                                    currentImage={formData.qrCodeImage}
-                                                />
+                                                <div className="flex justify-center p-4 bg-white/5 rounded-xl border border-white/10">
+                                                    <img
+                                                        src="/src/assets/donation-qr.png"
+                                                        alt="Donation QR Code"
+                                                        className="w-48 h-48 object-contain rounded-lg"
+                                                    />
+                                                </div>
+                                                {/* Hidden input to maintain form data structure if needed, or update logic to use static QR */}
                                             </div>
 
                                             <div className="mt-3 text-xs text-secondary opacity-70 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">

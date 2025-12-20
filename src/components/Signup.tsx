@@ -23,7 +23,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
         e.preventDefault()
 
         if (formData.password.length < 6) {
-            toast.warning('Security: Password must be at least 6 characters')
+            toast.warning('Password must be at least 6 characters')
             return
         }
 
@@ -33,13 +33,13 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
             const success = await signup(formData)
 
             if (success) {
-                toast.success('Strategy Activated: Welcome to the Network')
+                toast.success('Account created successfully')
                 onClose?.()
             } else {
-                toast.error('Identity Conflict: This email is already registered')
+                toast.error('This email is already registered')
             }
         } catch (error) {
-            toast.error('Sync Failure: Connection lost during registration')
+            toast.error('Registration failed. Please try again.')
             console.error(error)
         } finally {
             setLoading(false)
@@ -53,19 +53,19 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
                     <div className="auth-icon-badge">
                         <span className="material-symbols-outlined">person_add</span>
                     </div>
-                    <h2>New Operative</h2>
-                    <p>Register your credentials to join response teams</p>
+                    <h2>Create Account</h2>
+                    <p>Join the community to help or seek assistance</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">
-                        <label htmlFor="name">Full Identity</label>
+                        <label htmlFor="name">Full Name</label>
                         <div className="input-wrapper">
                             <span className="material-symbols-outlined input-icon">badge</span>
                             <input
                                 id="name"
                                 type="text"
-                                placeholder="Commander Name"
+                                placeholder="Enter your full name"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 required
@@ -74,13 +74,13 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="email">Global Registry Email</label>
+                        <label htmlFor="email">Email Address</label>
                         <div className="input-wrapper">
-                            <span className="material-symbols-outlined input-icon">alternate_email</span>
+                            <span className="material-symbols-outlined input-icon">mail</span>
                             <input
                                 id="email"
                                 type="email"
-                                placeholder="name@domain.com"
+                                placeholder="name@example.com"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 required
@@ -89,9 +89,9 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Security Protocol (Password)</label>
+                        <label htmlFor="password">Password</label>
                         <div className="input-wrapper">
-                            <span className="material-symbols-outlined input-icon">key</span>
+                            <span className="material-symbols-outlined input-icon">lock</span>
                             <input
                                 id="password"
                                 type="password"
@@ -105,7 +105,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
                     </div>
 
                     <div className="role-selector">
-                        <label>Mission Focus</label>
+                        <label>I am a...</label>
                         <div className="role-options">
                             <button
                                 type="button"
@@ -130,11 +130,11 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
                         {loading ? (
                             <div className="btn-loading">
                                 <span className="spinner-small"></span>
-                                INITIALIZING...
+                                Creating Account...
                             </div>
                         ) : (
                             <>
-                                ACTIVATE IDENTITY
+                                Sign Up
                                 <span className="material-symbols-outlined">bolt</span>
                             </>
                         )}
@@ -142,7 +142,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
                 </form>
 
                 <div className="auth-footer">
-                    <p>Registered already? <button onClick={onSwitchToLogin} className="auth-link-btn">ACCESS HUB</button></p>
+                    <p>Already have an account? <button onClick={onSwitchToLogin} className="auth-link-btn">Sign In</button></p>
                 </div>
             </div>
         </div>

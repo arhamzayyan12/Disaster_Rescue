@@ -12,6 +12,7 @@ import './App.css'
 const ReliefDashboard = lazy(() => import('./components/ReliefDashboard'))
 const SafetyGuidelines = lazy(() => import('./components/SafetyGuidelines'))
 const LiveNews = lazy(() => import('./components/LiveNews'))
+const DisasterAnalytics = lazy(() => import('./components/DisasterAnalytics'))
 
 // Loading Fallback
 const LoadingSpinner = () => (
@@ -133,6 +134,11 @@ function App() {
         </div>
 
         <Suspense fallback={<LoadingSpinner />}>
+          {/* Analytics View */}
+          {activeTab === 'analytics' && (
+            <DisasterAnalytics disasters={disasters} />
+          )}
+
           {/* Guidelines View */}
           {activeTab === 'guidelines' && (
             <SafetyGuidelines />
@@ -179,7 +185,7 @@ function App() {
           setLayers(prev => ({ ...prev, shelters: true }))
         }}
       />
-    </div>
+    </div >
   )
 }
 

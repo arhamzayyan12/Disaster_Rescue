@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import './Header.css'
 
-export type TabType = 'map' | 'relief' | 'guidelines' | 'news'
+export type TabType = 'map' | 'relief' | 'guidelines' | 'news' | 'analytics'
 
 interface HeaderProps {
     activeTab: TabType
@@ -16,6 +16,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLoginClick })
 
     const navItems: Array<{ id: TabType; label: string }> = [
         { id: 'map', label: 'Map Dashboard' },
+        { id: 'analytics', label: 'Disaster Analytics' },
         { id: 'relief', label: 'Relief Network' },
         { id: 'guidelines', label: 'Safety Guide' },
         { id: 'news', label: 'Live News' },
@@ -59,14 +60,32 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLoginClick })
                 </div>
 
                 {isAuthenticated && user ? (
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="header-login-btn logout"
-                        onClick={logout}
-                    >
-                        Logout
-                    </motion.button>
+                    <div className="user-profile">
+                        <div className="user-info">
+                            <span className="user-name">{user.name}</span>
+                            <span className="user-role">{user.role}</span>
+                        </div>
+                        {user.avatarUrl ? (
+                            <img
+                                src={user.avatarUrl}
+                                alt={user.name}
+                                className="user-avatar"
+                            />
+                        ) : (
+                            <div className="user-avatar-placeholder">
+                                {user.name.charAt(0)}
+                            </div>
+                        )}
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="header-logout-btn"
+                            onClick={logout}
+                            title="Logout"
+                        >
+                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>logout</span>
+                        </motion.button>
+                    </div>
                 ) : (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -74,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLoginClick })
                         className="header-login-btn"
                         onClick={onLoginClick}
                     >
-                        Login/Signup
+                        Login
                     </motion.button>
                 )}
             </div>

@@ -228,41 +228,45 @@
     filter: brightness(1.2);
 }
 
-.auth-demo-info {
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.demo-tag {
-    font-size: 0.7rem;
-    font-weight: 900;
-    color: rgba(255, 255, 255, 0.3);
-    letter-spacing: 0.2em;
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-.demo-pills {
+.google-auth-btn {
     display: flex;
-    gap: 8px;
+    align-items: center;
     justify-content: center;
-}
-
-.demo-pills button {
-    background: rgba(255, 255, 255, 0.03);
+    gap: 12px;
+    width: 100%;
+    padding: 16px;
+    background: white;
+    color: #3c4043;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 100px;
-    padding: 6px 12px;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    font-weight: 700;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.demo-pills button:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: white;
+.google-auth-btn:hover:not(:disabled) {
+    background: #f8f9fa;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.google-auth-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: #e0e0e0;
+}
+
+.google-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-sm {
+    font-size: 0.85rem;
 }
