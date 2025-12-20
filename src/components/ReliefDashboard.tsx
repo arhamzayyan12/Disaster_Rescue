@@ -7,6 +7,7 @@ import {
     fulfillRequest
 } from '../services/relief-service'
 import ReliefMap from './ReliefMap'
+import QRCodeUpload from './QRCodeUpload'
 import QRCodeDisplayModal from './QRCodeDisplayModal'
 import { useToast } from './Toast'
 import { useAuth } from '../contexts/AuthContext'
@@ -52,6 +53,11 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
     useEffect(() => {
         if (user) {
             setMode(user.role)
+            // Load saved QR code if available
+            const savedQR = localStorage.getItem(`user_qr_${user.id}`)
+            if (savedQR) {
+                setFormData(prev => ({ ...prev, qrCodeImage: savedQR }))
+            }
         }
     }, [user])
 
@@ -260,19 +266,36 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
                                                 </div>
                                             </div>
 
-                                            {/* QR Code Display (Permanent) */}
+                                            {/* QR Code Upload with Auto-Save */}
                                             <div className="mt-4">
                                                 <label className="block text-sm font-medium text-gray-400 mb-2">
-                                                    Scan to Donate
+                                                    Upload UPI QR Code (Google Pay / PhonePe / Paytm)
                                                 </label>
-                                                <div className="flex justify-center p-4 bg-white/5 rounded-xl border border-white/10">
-                                                    <img
-                                                        src="/src/assets/donation-qr.png"
-                                                        alt="Donation QR Code"
-                                                        className="w-48 h-48 object-contain rounded-lg"
-                                                    />
-                                                </div>
-                                                {/* Hidden input to maintain form data structure if needed, or update logic to use static QR */}
+                                                <QRCodeUpload
+                                                    onImageUpload={(base64Image) => {
+                                                        setFormData({ ...formData, qrCodeImage: base64Image })
+                                                        // Auto-save to localStorage for this user
+                                                        if (user?.id) {
+                                                            try {
+                                                                localStorage.setItem(`user_qr_${user.id}`, base64Image)
+                                                                toast.success('QR Code saved for future requests')
+                                                            } catch (e) {
+                                                                console.error('Failed to save QR to local storage', e)
+                                                            }
+                                                        }
+                                                    }}
+                                                    onImageRemove={() => {
+                                                        setFormData({ ...formData, qrCodeImage: '' })
+                                                        // Remove from storage
+                                                        if (user?.id) {
+                                                            localStorage.removeItem(`user_qr_${user.id}`)
+                                                        }
+                                                    }}
+                                                    currentImage={formData.qrCodeImage}
+                                                />
+                                                <p className="text-xs text-gray-500 mt-2">
+                                                    * Your QR code is saved locally for faster future requests.
+                                                </p>
                                             </div>
 
                                             <div className="mt-3 text-xs text-secondary opacity-70 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
