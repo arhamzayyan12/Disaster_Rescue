@@ -8,7 +8,7 @@ interface LoginProps {
     onClose?: () => void
 }
 
-const Login: React.FC<LoginProps> = ({ onClose }) => {
+const Login: React.FC<LoginProps> = ({ }) => {
     const { signInWithGoogle } = useAuth()
     const toast = useToast()
     const [loading, setLoading] = useState(false)

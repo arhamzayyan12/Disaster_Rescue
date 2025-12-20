@@ -1,148 +1,69 @@
 import React, { useState } from 'react'
-import { useAuth, SignupData } from '../contexts/AuthContext'
+import { useAuth } from '../contexts/AuthContext'
 import { useToast } from './Toast'
 import './Auth.css'
 
 interface SignupProps {
-    onSwitchToLogin: () => void
+    onSwitchToLogin: () => void // Kept for interface compatibility but unused in this new flow
     onClose?: () => void
 }
 
-const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
-    const { signup } = useAuth()
+const Signup: React.FC<SignupProps> = ({ }) => {
+    const { signInWithGoogle } = useAuth()
     const toast = useToast()
-    const [formData, setFormData] = useState<SignupData>({
-        name: '',
-        email: '',
-        password: '',
-        role: 'volunteer'
-    })
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-
-        if (formData.password.length < 6) {
-            toast.warning('Password must be at least 6 characters')
-            return
-        }
-
+    const handleGoogleSignup = async () => {
         setLoading(true)
-
         try {
-            const success = await signup(formData)
-
-            if (success) {
-                toast.success('Account created successfully')
-                onClose?.()
-            } else {
-                toast.error('This email is already registered')
-            }
+            await signInWithGoogle()
+            // Redirect happens automatically to Google/Supabase
         } catch (error) {
-            toast.error('Registration failed. Please try again.')
             console.error(error)
-        } finally {
+            toast.error('Failed to initiate Google Signup')
             setLoading(false)
         }
     }
 
     return (
         <div className="auth-container">
-            <div className="auth-card signup-card">
+            <div className="auth-card">
                 <div className="auth-header">
                     <div className="auth-icon-badge">
                         <span className="material-symbols-outlined">person_add</span>
                     </div>
                     <h2>Create Account</h2>
-                    <p>Join the community to help or seek assistance</p>
+                    <p>Join with your Google account to get started</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label htmlFor="name">Full Name</label>
-                        <div className="input-wrapper">
-                            <span className="material-symbols-outlined input-icon">badge</span>
-                            <input
-                                id="name"
-                                type="text"
-                                placeholder="Enter your full name"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="email">Email Address</label>
-                        <div className="input-wrapper">
-                            <span className="material-symbols-outlined input-icon">mail</span>
-                            <input
-                                id="email"
-                                type="email"
-                                placeholder="name@example.com"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <div className="input-wrapper">
-                            <span className="material-symbols-outlined input-icon">lock</span>
-                            <input
-                                id="password"
-                                type="password"
-                                placeholder="Min. 6 characters"
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                required
-                                minLength={6}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="role-selector">
-                        <label>I am a...</label>
-                        <div className="role-options">
-                            <button
-                                type="button"
-                                className={`role-btn ${formData.role === 'volunteer' ? 'active' : ''}`}
-                                onClick={() => setFormData({ ...formData, role: 'volunteer' })}
-                            >
-                                <span className="material-symbols-outlined">volunteer_activism</span>
-                                Volunteer
-                            </button>
-                            <button
-                                type="button"
-                                className={`role-btn ${formData.role === 'victim' ? 'active' : ''}`}
-                                onClick={() => setFormData({ ...formData, role: 'victim' })}
-                            >
-                                <span className="material-symbols-outlined">emergency_record</span>
-                                Affected
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                <div className="auth-form">
+                    <button
+                        onClick={handleGoogleSignup}
+                        className="google-auth-btn"
+                        disabled={loading}
+                    >
                         {loading ? (
                             <div className="btn-loading">
                                 <span className="spinner-small"></span>
-                                Creating Account...
+                                Connecting...
                             </div>
                         ) : (
                             <>
-                                Sign Up
-                                <span className="material-symbols-outlined">bolt</span>
+                                <img
+                                    src="https://www.google.com/favicon.ico"
+                                    alt="Google"
+                                    className="google-icon"
+                                />
+                                Sign up with Google
                             </>
                         )}
                     </button>
-                </form>
+                </div>
 
                 <div className="auth-footer">
-                    <p>Already have an account? <button onClick={onSwitchToLogin} className="auth-link-btn">Sign In</button></p>
+                    <p className="text-secondary text-sm">
+                        By continuing, you verify that you are a trusted entity.
+                    </p>
                 </div>
             </div>
         </div>
