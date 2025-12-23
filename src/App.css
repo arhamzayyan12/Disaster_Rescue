@@ -21,7 +21,7 @@
 .main-content {
   flex: 1;
   height: calc(100vh - 120px);
-  /* Adjust for header and ticker */
+  height: calc(100dvh - 120px);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -32,14 +32,24 @@
   overflow-y: auto;
   overflow-x: hidden;
   display: block;
-  /* Allow scrolling for non-flex pages like News/Guide */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Response Layout */
+/* Mobile Responsive Layout */
 @media (max-width: 768px) {
   .app-container {
-    /* Maintain column layout for mobile too, relying on Header responsiveness if implemented */
     flex-direction: column;
+    padding-bottom: 50px;
+  }
+
+  .main-content {
+    height: calc(100vh - 110px);
+    height: calc(100dvh - 110px);
+  }
+
+  .main-content.scrollable {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 }
 

@@ -6,6 +6,7 @@ import NewsTicker from './components/NewsTicker'
 import { Disaster } from './types'
 
 import { fetchAllDisasters } from './services/disaster-data-service'
+import { Analytics } from '@vercel/analytics/react'
 import './App.css'
 
 // Lazy load heavy components
@@ -98,76 +99,80 @@ function App() {
 
   return (
     <div className="app-container">
-      <Header
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onLoginClick={() => setShowAuthModal(true)}
-      />
+      {!showAuthModal && (
+        <Header
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onLoginClick={() => setShowAuthModal(true)}
+        />
+      )}
 
-      <main className={`main-content ${['guidelines', 'news'].includes(activeTab) ? 'scrollable' : ''}`}>
-        {/* Map View - Keep outside Suspense to prevent unmounting/remounting issues */}
-        <div style={{ display: activeTab === 'map' ? 'block' : 'none', height: '100%', width: '100%' }}>
-          <MapDashboard
-            disasters={disasters}
-            selectedDisaster={selectedDisaster}
-            onDisasterSelect={setSelectedDisaster}
-            layers={layers}
-            onToggleLayer={handleToggleLayer}
-            onNeedHelp={() => {
-              setReliefMode('victim')
-              setActiveTab('relief')
-            }}
-            onCanHelp={() => {
-              setReliefMode('volunteer')
-              setActiveTab('relief')
-            }}
-          />
-        </div>
-
-        {/* Relief View - Keep alive after first load */}
-        <div style={{ display: activeTab === 'relief' ? 'block' : 'none', height: '100%', width: '100%' }}>
-          {(activeTab === 'relief' || reliefLoaded) && (
-            <Suspense fallback={<LoadingSpinner />}>
-              <ReliefDashboard userLocation={userLocation} initialMode={reliefMode} />
-            </Suspense>
-          )}
-        </div>
-
-        <Suspense fallback={<LoadingSpinner />}>
-          {/* Analytics View */}
-          {activeTab === 'analytics' && (
-            <DisasterAnalytics disasters={disasters} />
-          )}
-
-          {/* Guidelines View */}
-          {activeTab === 'guidelines' && (
-            <SafetyGuidelines />
-          )}
-
-          {/* News View */}
-          {activeTab === 'news' && (
-            <LiveNews
+      {!showAuthModal && (
+        <main className={`main-content ${['guidelines', 'news', 'analytics'].includes(activeTab) ? 'scrollable' : ''}`}>
+          {/* Map View - Keep outside Suspense to prevent unmounting/remounting issues */}
+          <div style={{ display: activeTab === 'map' ? 'block' : 'none', height: '100%', width: '100%' }}>
+            <MapDashboard
               disasters={disasters}
-              isLoading={isLoading}
-              onDisasterSelect={(disaster) => {
-                // Validate coordinates before selecting disaster
-                const lat = disaster.location.lat
-                const lng = disaster.location.lng
-
-                if (!isNaN(lat) && !isNaN(lng) && isFinite(lat) && isFinite(lng)) {
-                  setSelectedDisaster(disaster)
-                  setActiveTab('map')
-                  // Auto-enable shelters layer when selecting from news
-                  setLayers(prev => ({ ...prev, shelters: true }))
-                } else {
-                  console.error('Cannot navigate to disaster with invalid coordinates:', disaster)
-                  alert('Unable to show this location on the map. The coordinates are invalid.')
-                }
+              selectedDisaster={selectedDisaster}
+              onDisasterSelect={setSelectedDisaster}
+              layers={layers}
+              onToggleLayer={handleToggleLayer}
+              onNeedHelp={() => {
+                setReliefMode('victim')
+                setActiveTab('relief')
+              }}
+              onCanHelp={() => {
+                setReliefMode('volunteer')
+                setActiveTab('relief')
               }}
             />
-          )}
-        </Suspense>
-      </main>
+          </div>
+
+          {/* Relief View - Keep alive after first load */}
+          <div style={{ display: activeTab === 'relief' ? 'block' : 'none', height: '100%', width: '100%' }}>
+            {(activeTab === 'relief' || reliefLoaded) && (
+              <Suspense fallback={<LoadingSpinner />}>
+                <ReliefDashboard userLocation={userLocation} initialMode={reliefMode} />
+              </Suspense>
+            )}
+          </div>
+
+          <Suspense fallback={<LoadingSpinner />}>
+            {/* Analytics View */}
+            {activeTab === 'analytics' && (
+              <DisasterAnalytics disasters={disasters} />
+            )}
+
+            {/* Guidelines View */}
+            {activeTab === 'guidelines' && (
+              <SafetyGuidelines />
+            )}
+
+            {/* News View */}
+            {activeTab === 'news' && (
+              <LiveNews
+                disasters={disasters}
+                isLoading={isLoading}
+                onDisasterSelect={(disaster) => {
+                  // Validate coordinates before selecting disaster
+                  const lat = disaster.location.lat
+                  const lng = disaster.location.lng
+
+                  if (!isNaN(lat) && !isNaN(lng) && isFinite(lat) && isFinite(lng)) {
+                    setSelectedDisaster(disaster)
+                    setActiveTab('map')
+                    // Auto-enable shelters layer when selecting from news
+                    setLayers(prev => ({ ...prev, shelters: true }))
+                  } else {
+                    console.error('Cannot navigate to disaster with invalid coordinates:', disaster)
+                    alert('Unable to show this location on the map. The coordinates are invalid.')
+                  }
+                }}
+              />
+            )}
+          </Suspense>
+        </main>
+      )}
 
       {/* Auth Modal */}
       <AuthModal
@@ -177,14 +182,19 @@ function App() {
       />
 
       {/* Global Intel Ticker */}
-      <NewsTicker
-        disasters={disasters}
-        onDisasterSelect={(disaster) => {
-          setSelectedDisaster(disaster)
-          setActiveTab('map')
-          setLayers(prev => ({ ...prev, shelters: true }))
-        }}
-      />
+      {!showAuthModal && (
+        <NewsTicker
+          disasters={disasters}
+          onDisasterSelect={(disaster) => {
+            setSelectedDisaster(disaster)
+            setActiveTab('map')
+            setLayers(prev => ({ ...prev, shelters: true }))
+          }}
+        />
+      )}
+
+      {/* Vercel Analytics */}
+      <Analytics />
     </div >
   )
 }
