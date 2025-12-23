@@ -46,6 +46,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLoginClick })
                             className={`nav-link ${activeTab === item.id ? 'active' : ''}`}
                             onClick={() => onTabChange(item.id)}
                             style={{ position: 'relative' }}
+                            aria-label={`Navigate to ${item.label}`}
+                            aria-current={activeTab === item.id ? 'page' : undefined}
                         >
                             {item.label}
                             {activeTab === item.id && (
@@ -70,12 +72,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLoginClick })
                                 src={user.avatarUrl}
                                 alt={user.name}
                                 className="user-avatar"
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                }}
                             />
-                        ) : (
-                            <div className="user-avatar-placeholder">
-                                {user.name.charAt(0)}
-                            </div>
-                        )}
+                        ) : null}
+                        <div className={`user-avatar-placeholder ${user.avatarUrl ? 'hidden' : ''}`}>
+                            {user.name.charAt(0).toUpperCase()}
+                        </div>
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}

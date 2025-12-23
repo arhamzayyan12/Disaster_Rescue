@@ -1,5 +1,4 @@
 import { ReliefRequest, ReliefRequestType, RequestStatus } from '../types/relief'
-import { fetchAllDisasters } from './disaster-data-service'
 import { supabase } from '../lib/supabase'
 
 // Map DB row to ReliefRequest interface
@@ -19,6 +18,9 @@ const mapFromDb = (row: any): ReliefRequest => ({
     title: row.title,
     description: row.description,
     quantity: row.quantity,
+    amount: row.amount,
+    upiId: row.upi_id,
+    qrCodeImage: row.qr_code_image,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     verificationStatus: row.verification_status,
@@ -45,6 +47,9 @@ const mapToDb = (req: Partial<ReliefRequest>) => {
     if (req.title) dbRow.title = req.title
     if (req.description) dbRow.description = req.description
     if (req.quantity) dbRow.quantity = req.quantity
+    if (req.amount) dbRow.amount = req.amount
+    if (req.upiId) dbRow.upi_id = req.upiId
+    if (req.qrCodeImage) dbRow.qr_code_image = req.qrCodeImage
     if (req.verificationStatus) dbRow.verification_status = req.verificationStatus
     if (req.volunteerId) dbRow.volunteer_id = req.volunteerId
     if (req.volunteerName) dbRow.volunteer_name = req.volunteerName
@@ -54,49 +59,12 @@ const mapToDb = (req: Partial<ReliefRequest>) => {
     return dbRow
 }
 
-// Dynamic Relief Injection System - now seeds Supabase
-const seedContextualRequests = async (): Promise<void> => {
-    try {
-        const { count } = await supabase.from('relief_requests').select('*', { count: 'exact', head: true })
-        if (count && count > 0) return
 
-        const disasters = await fetchAllDisasters();
-        if (disasters.length === 0) return;
-
-        const inducedRows = disasters.map((d) => {
-            const types: ReliefRequestType[] = ['food', 'medical', 'shelter', 'rescue', 'monetary'];
-            const randomType = types[Math.floor(Math.random() * types.length)];
-
-            return {
-                type: randomType,
-                urgency: d.severity === 'critical' || d.severity === 'high' ? 'critical' : 'high',
-                status: 'pending',
-                victim_name: `Resident of ${d.location.name}`,
-                victim_contact: '+91 00000 00000',
-                lat: d.location.lat + (Math.random() - 0.5) * 0.01,
-                lng: d.location.lng + (Math.random() - 0.5) * 0.01,
-                address: `${d.location.name}, ${d.location.state}`,
-                landmark: 'Detection Zone',
-                title: `Relief Needed: ${d.type.toUpperCase()} in ${d.location.name}`,
-                description: `Emergency support required following the official NDMA alert: ${d.description.substring(0, 100)}...`,
-                quantity: randomType === 'monetary' ? '₹5,000' : 'Immediate Support',
-                verification_status: 'verified',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            };
-        });
-
-        await supabase.from('relief_requests').insert(inducedRows)
-    } catch (e) {
-        console.error('Relief Induction Failure:', e);
-    }
-};
 
 /**
  * Get all relief requests
  */
 export async function getAllReliefRequests(): Promise<ReliefRequest[]> {
-    await seedContextualRequests()
     const { data, error } = await supabase
         .from('relief_requests')
         .select('*')
@@ -289,4 +257,40 @@ export async function getRequestsNearLocation(
     return data
         .map(mapFromDb)
         .filter(req => calculateDistance(lat, lng, req.location.lat, req.location.lng) <= radiusKm)
+}
+
+/**
+ * User Profile Management
+ */
+
+export async function getUserProfile(userId: string) {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+    if (error) {
+        console.error('Error fetching profile:', error)
+        return null
+    }
+    return data
+}
+
+export async function updateUserProfile(userId: string, updates: {
+    upi_id?: string,
+    qr_code_image?: string,
+    full_name?: string,
+    avatar_url?: string
+}) {
+    const { data, error } = await supabase
+        .from('profiles')
+        .upsert({ id: userId, ...updates, updated_at: new Date().toISOString() })
+        .select()
+
+    if (error) {
+        console.error('Error updating profile:', error)
+        throw error
+    }
+    return data
 }

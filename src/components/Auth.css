@@ -216,16 +216,19 @@
     background: none;
     border: none;
     color: var(--accent);
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
-    padding: 0;
-    margin-left: 4px;
-    transition: color 0.2s;
+    padding: 0 4px;
+    margin: 0;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+    display: inline-block;
 }
 
 .auth-link-btn:hover {
-    text-decoration: underline;
-    filter: brightness(1.2);
+    text-decoration: none;
+    transform: translateY(-1px);
+    text-shadow: 0 0 8px var(--accent-glow);
 }
 
 .google-auth-btn {
@@ -267,6 +270,26 @@
     color: var(--text-secondary);
 }
 
-.text-sm {
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    width: 100%;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-divider span {
+    color: var(--text-secondary);
     font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }

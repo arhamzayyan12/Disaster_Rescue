@@ -4,7 +4,9 @@ import {
     getAllReliefRequests,
     createReliefRequest,
     respondToRequest,
-    fulfillRequest
+    fulfillRequest,
+    getUserProfile,
+    updateUserProfile
 } from '../services/relief-service'
 import ReliefMap from './ReliefMap'
 import QRCodeUpload from './QRCodeUpload'
@@ -22,7 +24,7 @@ type UserMode = 'victim' | 'volunteer'
 
 const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initialMode }) => {
     const toast = useToast()
-    const { user, isAuthenticated } = useAuth()
+    const { user, isAuthenticated, loading } = useAuth()
     const [mode, setMode] = useState<UserMode>(initialMode || user?.role || 'volunteer')
 
     useEffect(() => {
@@ -53,11 +55,18 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
     useEffect(() => {
         if (user) {
             setMode(user.role)
-            // Load saved QR code if available
-            const savedQR = localStorage.getItem(`user_qr_${user.id}`)
-            if (savedQR) {
-                setFormData(prev => ({ ...prev, qrCodeImage: savedQR }))
+            // Load saved QR code from Cloud Profile
+            const loadProfile = async () => {
+                const profile = await getUserProfile(user.id)
+                if (profile) {
+                    setFormData(prev => ({
+                        ...prev,
+                        qrCodeImage: profile.qr_code_image || prev.qrCodeImage,
+                        upiId: profile.upi_id || prev.upiId
+                    }))
+                }
             }
+            loadProfile()
         }
     }, [user])
 
@@ -196,7 +205,12 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
             </div>
 
             <div className="relief-content">
-                {mode === 'victim' ? (
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center h-full pb-20">
+                        <div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+                        <p className="text-gray-400 font-medium">Verifying Credentials...</p>
+                    </div>
+                ) : mode === 'victim' ? (
                     <div className="request-help-container">
                         <div className="request-content-wrapper">
                             <div className="page-heading">
@@ -232,14 +246,17 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
                                             { id: 'rescue', label: 'Rescue', icon: 'sos' },
                                             { id: 'shelter', label: 'Shelter', icon: 'cottage' }
                                         ].map(item => (
-                                            <div
+                                            <button
+                                                type="button"
                                                 key={item.id}
                                                 className={`need-card ${formData.type === item.id ? 'selected' : ''}`}
                                                 onClick={() => setFormData({ ...formData, type: item.id as ReliefRequestType })}
+                                                aria-pressed={formData.type === item.id}
+                                                aria-label={`Select ${item.label} assistance`}
                                             >
                                                 <span className="material-symbols-outlined need-icon">{item.icon}</span>
                                                 <span className="need-label">{item.label}</span>
-                                            </div>
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
@@ -274,27 +291,24 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
                                                 <QRCodeUpload
                                                     onImageUpload={(base64Image) => {
                                                         setFormData({ ...formData, qrCodeImage: base64Image })
-                                                        // Auto-save to localStorage for this user
+                                                        // Save to Supabase Cloud Profile
                                                         if (user?.id) {
-                                                            try {
-                                                                localStorage.setItem(`user_qr_${user.id}`, base64Image)
-                                                                toast.success('QR Code saved for future requests')
-                                                            } catch (e) {
-                                                                console.error('Failed to save QR to local storage', e)
-                                                            }
+                                                            updateUserProfile(user.id, { qr_code_image: base64Image })
+                                                                .then(() => toast.success('QR Code saved to your cloud profile'))
+                                                                .catch(() => toast.error('Failed to save to cloud profile'))
                                                         }
                                                     }}
                                                     onImageRemove={() => {
                                                         setFormData({ ...formData, qrCodeImage: '' })
-                                                        // Remove from storage
+                                                        // Remove from Cloud Profile
                                                         if (user?.id) {
-                                                            localStorage.removeItem(`user_qr_${user.id}`)
+                                                            updateUserProfile(user.id, { qr_code_image: '' })
                                                         }
                                                     }}
                                                     currentImage={formData.qrCodeImage}
                                                 />
                                                 <p className="text-xs text-gray-500 mt-2">
-                                                    * Your QR code is saved locally for faster future requests.
+                                                    * Your QR code is backed up to your account securely.
                                                 </p>
                                             </div>
 
@@ -364,13 +378,15 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
                                     <div className="urgency-container">
                                         <div className="urgency-selector">
                                             {['critical', 'high', 'medium'].map(u => (
-                                                <div
+                                                <button
+                                                    type="button"
                                                     key={u}
                                                     className={`urgency-option ${u} ${formData.urgency === u ? 'selected' : ''}`}
                                                     onClick={() => setFormData({ ...formData, urgency: u as RequestUrgency })}
+                                                    aria-pressed={formData.urgency === u}
                                                 >
                                                     {u.charAt(0).toUpperCase() + u.slice(1)}
-                                                </div>
+                                                </button>
                                             ))}
                                         </div>
                                     </div>
@@ -420,87 +436,108 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
                         </div>
                     </div>
                 ) : (
-                    // Volunteer Mode
-                    <div className="volunteer-dashboard-container">
-                        <div className="volunteer-header">
-                            <h1>Volunteer Dashboard</h1>
-                            <p>Manage and respond to active help requests.</p>
+                    // Volunteer Mode - Protected Route
+                    !isAuthenticated ? (
+                        <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6">
+                            <div className="bg-blue-500/10 p-6 rounded-full">
+                                <span className="material-symbols-outlined text-blue-400" style={{ fontSize: '48px' }}>secure</span>
+                            </div>
+                            <h2 className="text-3xl font-bold font-outfit">Volunteer Access Restricted</h2>
+                            <p className="text-gray-400 max-w-md">
+                                You must be a verified user to access the responder network and view sensitive relief request data.
+                            </p>
+                            <button
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/25"
+                                onClick={() => {
+                                    // This relies on the parent passing a login handler or triggering the auth modal 
+                                    // Since we don't have direct access to openAuthModal here, we warn the user.
+                                    toast.error('Please click "Login" in the top right corner.')
+                                }}
+                            >
+                                Login to Respond
+                            </button>
                         </div>
+                    ) : (
+                        <div className="volunteer-dashboard-container">
+                            <div className="volunteer-header">
+                                <h1>Volunteer Dashboard</h1>
+                                <p>Manage and respond to active help requests.</p>
+                            </div>
 
-                        <div className="volunteer-grid">
-                            {/* Left: Request Management */}
-                            <div className="requests-column">
-                                <div className="filter-tabs">
-                                    {(['all', 'pending', 'in-progress', 'fulfilled'] as const).map(f => (
-                                        <button
-                                            key={f}
-                                            className={`filter-tab ${filter === f ? 'active' : ''}`}
-                                            onClick={() => setFilter(f)}
-                                        >
-                                            {f.charAt(0).toUpperCase() + f.slice(1)}
-                                        </button>
-                                    ))}
-                                </div>
+                            <div className="volunteer-grid">
+                                {/* Left: Request Management */}
+                                <div className="requests-column">
+                                    <div className="filter-tabs">
+                                        {(['all', 'pending', 'in-progress', 'fulfilled'] as const).map(f => (
+                                            <button
+                                                key={f}
+                                                className={`filter-tab ${filter === f ? 'active' : ''}`}
+                                                onClick={() => setFilter(f)}
+                                            >
+                                                {f.charAt(0).toUpperCase() + f.slice(1)}
+                                            </button>
+                                        ))}
+                                    </div>
 
-                                <div className="requests-table-container">
-                                    <table className="requests-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Request Type</th>
-                                                <th>Location</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {filteredRequests.map(req => (
-                                                <tr key={req.id}>
-                                                    <td>
-                                                        <div className="font-medium text-white">{req.type.charAt(0).toUpperCase() + req.type.slice(1)}</div>
-                                                        <div className="text-xs text-gray-500">{req.urgency.toUpperCase()}</div>
-                                                    </td>
-                                                    <td>{req.location.address?.slice(0, 20)}...</td>
-                                                    <td>
-                                                        <span className={`status-badge ${req.status}`}>
-                                                            {req.status.replace('-', ' ').toUpperCase()}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <button
-                                                            className="action-btn"
-                                                            onClick={() => handleAction(req)}
-                                                        >
-                                                            {req.type === 'monetary'
-                                                                ? 'View QR Code'
-                                                                : req.status === 'pending'
-                                                                    ? 'Accept Request'
-                                                                    : req.status === 'in-progress'
-                                                                        ? 'Mark Complete'
-                                                                        : 'View Details'}
-                                                        </button>
-                                                    </td>
+                                    <div className="requests-table-container">
+                                        <table className="requests-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Request Type</th>
+                                                    <th>Location</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {filteredRequests.map(req => (
+                                                    <tr key={req.id}>
+                                                        <td>
+                                                            <div className="font-medium text-white">{req.type.charAt(0).toUpperCase() + req.type.slice(1)}</div>
+                                                            <div className="text-xs text-gray-500">{req.urgency.toUpperCase()}</div>
+                                                        </td>
+                                                        <td>{req.location.address?.slice(0, 20)}...</td>
+                                                        <td>
+                                                            <span className={`status-badge ${req.status}`}>
+                                                                {req.status.replace('-', ' ').toUpperCase()}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button
+                                                                className="action-btn"
+                                                                onClick={() => handleAction(req)}
+                                                            >
+                                                                {req.type === 'monetary'
+                                                                    ? 'View QR Code'
+                                                                    : req.status === 'pending'
+                                                                        ? 'Accept Request'
+                                                                        : req.status === 'in-progress'
+                                                                            ? 'Mark Complete'
+                                                                            : 'View Details'}
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Right: Map */}
-                            <div className="map-column">
-                                <h3 className="text-white fo nt-bold text-lg">Relief Map</h3>
-                                <div className="map-card">
-                                    <ReliefMap
-                                        requests={filteredRequests}
-                                        userLocation={userLocation}
-                                        selectedRequest={selectedRequest}
-                                        onRequestSelect={setSelectedRequest}
-                                    />
+                                {/* Right: Map */}
+                                <div className="map-column">
+                                    <h3 className="text-white fo nt-bold text-lg">Relief Map</h3>
+                                    <div className="map-card">
+                                        <ReliefMap
+                                            requests={filteredRequests}
+                                            userLocation={userLocation}
+                                            selectedRequest={selectedRequest}
+                                            onRequestSelect={setSelectedRequest}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    ))}
             </div>
 
             {/* QR Code Display Modal */}

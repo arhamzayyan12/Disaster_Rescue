@@ -8,7 +8,7 @@ interface LoginProps {
     onClose?: () => void
 }
 
-const Login: React.FC<LoginProps> = ({ }) => {
+const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onClose }) => {
     const { signInWithGoogle } = useAuth()
     const toast = useToast()
     const [loading, setLoading] = useState(false)
@@ -37,28 +37,111 @@ const Login: React.FC<LoginProps> = ({ }) => {
                 </div>
 
                 <div className="auth-form">
-                    <button
-                        onClick={handleGoogleLogin}
-                        className="google-auth-btn"
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <div className="btn-loading">
-                                <span className="spinner-small"></span>
-                                Connecting...
-                            </div>
-                        ) : (
-                            <>
-                                <img
-                                    src="https://www.google.com/favicon.ico"
-                                    alt="Google"
-                                    className="google-icon"
+                    <form onSubmit={async (e) => {
+                        e.preventDefault()
+                        setLoading(true)
+                        const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value
+                        const password = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value
+
+                        // Basic validation
+                        if (!email || !password) {
+                            toast.error('Please fill in all fields')
+                            setLoading(false)
+                            return
+                        }
+
+                        try {
+                            await (useAuth() as any).signInWithEmail(email, password)
+                            if (onClose) onClose()
+                            toast.success('Logged in successfully')
+                        } catch (error: any) {
+                            toast.error(error.message || 'Login failed')
+                        } finally {
+                            setLoading(false)
+                        }
+                    }}>
+                        <div className="form-group">
+                            <label>Email Address</label>
+                            <div className="input-wrapper">
+                                <span className="material-symbols-outlined input-icon">mail</span>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="name@example.com"
+                                    required
                                 />
-                                Continue with Google
-                            </>
-                        )}
-                    </button>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Password</label>
+                            <div className="input-wrapper">
+                                <span className="material-symbols-outlined input-icon">lock</span>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    placeholder="Enter your password"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="auth-submit-btn"
+                            style={{ width: '100%' }}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <div className="btn-loading">
+                                    <span className="spinner-small"></span>
+                                    Signing In...
+                                </div>
+                            ) : (
+                                <>
+                                    <span>Sign In</span>
+                                    <span className="material-symbols-outlined">login</span>
+                                </>
+                            )}
+                        </button>
+                    </form>
                 </div>
+
+                <div className="auth-divider">
+                    <span>OR</span>
+                </div>
+
+                <button
+                    onClick={handleGoogleLogin}
+                    className="google-auth-btn"
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <div className="btn-loading">
+                            <span className="spinner-small"></span>
+                            Connecting...
+                        </div>
+                    ) : (
+                        <>
+                            <img
+                                src="https://www.google.com/favicon.ico"
+                                alt="Google"
+                                className="google-icon"
+                            />
+                            Continue with Google
+                        </>
+                    )}
+                </button>
+
+                <p className="text-center mt-6 text-gray-400 text-sm">
+                    Don't have an account?{' '}
+                    <button
+                        onClick={onSwitchToSignup}
+                        className="auth-link-btn"
+                    >
+                        Sign up
+                    </button>
+                </p>
 
                 <div className="auth-footer">
                     <p className="text-secondary text-sm">

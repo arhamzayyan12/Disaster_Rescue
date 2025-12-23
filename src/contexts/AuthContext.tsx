@@ -15,6 +15,8 @@ interface AuthContextType {
     user: User | null
     isAuthenticated: boolean
     signInWithGoogle: () => Promise<void>
+    signInWithEmail: (email: string, password: string) => Promise<void>
+    signUpWithEmail: (email: string, password: string, name: string) => Promise<void>
     logout: () => Promise<void>
     loading: boolean
 }
@@ -102,10 +104,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }
 
+    const signInWithEmail = async (email: string, password: string) => {
+        try {
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            })
+            if (error) throw error
+        } catch (error) {
+            console.error('Email login failed:', error)
+            throw error
+        }
+    }
+
+    const signUpWithEmail = async (email: string, password: string, name: string) => {
+        try {
+            const { error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        name: name,
+                    }
+                }
+            })
+            if (error) throw error
+        } catch (error) {
+            console.error('Email signup failed:', error)
+            throw error
+        }
+    }
+
     const value: AuthContextType = {
         user,
         isAuthenticated: !!user,
         signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
         logout,
         loading
     }
