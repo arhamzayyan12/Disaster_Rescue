@@ -37,9 +37,57 @@ function App() {
     shelters: false
   })
 
-  const handleToggleLayer = (layer: 'weather' | 'disasters' | 'shelters') => {
+  const handleToggleLayer = useCallback((layer: 'weather' | 'disasters' | 'shelters') => {
     setLayers(prev => ({ ...prev, [layer]: !prev[layer] }))
-  }
+  }, [])
+
+  const handleTabChange = useCallback((tab: TabType) => {
+    setActiveTab(tab)
+  }, [])
+
+  const handleLoginClick = useCallback(() => {
+    setShowAuthModal(true)
+  }, [])
+
+  const handleAuthModalClose = useCallback(() => {
+    setShowAuthModal(false)
+  }, [])
+
+  const handleDisasterSelect = useCallback((disaster: Disaster | null) => {
+    setSelectedDisaster(disaster)
+  }, [])
+
+  const handleNeedHelp = useCallback(() => {
+    setReliefMode('victim')
+    setActiveTab('relief')
+  }, [])
+
+  const handleCanHelp = useCallback(() => {
+    setReliefMode('volunteer')
+    setActiveTab('relief')
+  }, [])
+
+  const handleNewsDisasterSelect = useCallback((disaster: Disaster) => {
+    // Validate coordinates before selecting disaster
+    const lat = disaster.location.lat
+    const lng = disaster.location.lng
+
+    if (!isNaN(lat) && !isNaN(lng) && isFinite(lat) && isFinite(lng)) {
+      setSelectedDisaster(disaster)
+      setActiveTab('map')
+      // Auto-enable shelters layer when selecting from news
+      setLayers(prev => ({ ...prev, shelters: true }))
+    } else {
+      console.error('Cannot navigate to disaster with invalid coordinates:', disaster)
+      alert('Unable to show this location on the map. The coordinates are invalid.')
+    }
+  }, [])
+
+  const handleTickerDisasterSelect = useCallback((disaster: Disaster) => {
+    setSelectedDisaster(disaster)
+    setActiveTab('map')
+    setLayers(prev => ({ ...prev, shelters: true }))
+  }, [])
 
   // User location
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | undefined>()
@@ -102,8 +150,8 @@ function App() {
       {!showAuthModal && (
         <Header
           activeTab={activeTab}
-          onTabChange={setActiveTab}
-          onLoginClick={() => setShowAuthModal(true)}
+          onTabChange={handleTabChange}
+          onLoginClick={handleLoginClick}
         />
       )}
 
@@ -114,17 +162,11 @@ function App() {
             <MapDashboard
               disasters={disasters}
               selectedDisaster={selectedDisaster}
-              onDisasterSelect={setSelectedDisaster}
+              onDisasterSelect={handleDisasterSelect}
               layers={layers}
               onToggleLayer={handleToggleLayer}
-              onNeedHelp={() => {
-                setReliefMode('victim')
-                setActiveTab('relief')
-              }}
-              onCanHelp={() => {
-                setReliefMode('volunteer')
-                setActiveTab('relief')
-              }}
+              onNeedHelp={handleNeedHelp}
+              onCanHelp={handleCanHelp}
             />
           </div>
 
@@ -153,21 +195,7 @@ function App() {
               <LiveNews
                 disasters={disasters}
                 isLoading={isLoading}
-                onDisasterSelect={(disaster) => {
-                  // Validate coordinates before selecting disaster
-                  const lat = disaster.location.lat
-                  const lng = disaster.location.lng
-
-                  if (!isNaN(lat) && !isNaN(lng) && isFinite(lat) && isFinite(lng)) {
-                    setSelectedDisaster(disaster)
-                    setActiveTab('map')
-                    // Auto-enable shelters layer when selecting from news
-                    setLayers(prev => ({ ...prev, shelters: true }))
-                  } else {
-                    console.error('Cannot navigate to disaster with invalid coordinates:', disaster)
-                    alert('Unable to show this location on the map. The coordinates are invalid.')
-                  }
-                }}
+                onDisasterSelect={handleNewsDisasterSelect}
               />
             )}
           </Suspense>
@@ -177,7 +205,7 @@ function App() {
       {/* Auth Modal */}
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        onClose={handleAuthModalClose}
         initialMode="login"
       />
 
@@ -185,11 +213,7 @@ function App() {
       {!showAuthModal && (
         <NewsTicker
           disasters={disasters}
-          onDisasterSelect={(disaster) => {
-            setSelectedDisaster(disaster)
-            setActiveTab('map')
-            setLayers(prev => ({ ...prev, shelters: true }))
-          }}
+          onDisasterSelect={handleTickerDisasterSelect}
         />
       )}
 

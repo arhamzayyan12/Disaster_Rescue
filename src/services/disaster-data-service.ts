@@ -1,9 +1,6 @@
 import { Disaster, DisasterType, Severity } from '../types'
 import { indianCities } from '../constants/locations'
-
-// Simplified Indian cities lookup for location mapping
-// (Now imported from constants/locations.ts)
-
+import { getStringContent, xmlToObject } from '../utils/xml-utils'
 
 // Extract location from text (returns first match)
 function extractLocation(text: string): { name: string; state: string; lat: number; lng: number } | null {
@@ -61,21 +58,48 @@ function extractStateLocation(text: string): { name: string; state: string; lat:
 function detectDisasterType(text: string): DisasterType {
   const lowerText = text.toLowerCase()
 
-  // Check for heavy rain/flooding (most common in RSS feed)
-  if (lowerText.includes('heavy rain') || lowerText.includes('heavy  rain') ||
-    (lowerText.includes('rain') && (lowerText.includes('07-11 cm') || lowerText.includes('flood')))) {
-    return 'flood'
+  // 1. Check for Thunderstorm/Lightning
+  if (lowerText.includes('thunderstorm') || lowerText.includes('thunder') || lowerText.includes('lightning') || lowerText.includes('तड़ित')) {
+    return 'thunderstorm'
   }
-  if (lowerText.includes('flood') || lowerText.includes('flooding') || lowerText.includes('inundat')) {
-    return 'flood'
-  }
+
+  // 2. Check for Earthquake
   if (lowerText.includes('earthquake') || lowerText.includes('quake') || lowerText.includes('seismic')) {
     return 'earthquake'
   }
+
+  // 3. Check for Cyclone/Storm
   if (lowerText.includes('cyclone') || lowerText.includes('hurricane') || lowerText.includes('typhoon') ||
     lowerText.includes('squally weather') || lowerText.includes('strong wind')) {
     return 'cyclone'
   }
+
+  // 4. Check for Heatwave
+  if (lowerText.includes('heat wave') || lowerText.includes('heatwave') || lowerText.includes('loo')) {
+    return 'heatwave'
+  }
+
+  // 5. Check for Coldwave
+  if (lowerText.includes('cold wave') || lowerText.includes('cold wave conditions') ||
+    lowerText.includes('शीत लहर') || lowerText.includes('कोल्ड डे')) {
+    return 'coldwave'
+  }
+
+  // 6. Check for Rain (Specific Weather)
+  if (lowerText.includes('rain') || lowerText.includes('rainfall') || lowerText.includes('वर्षा')) {
+    // Only return flood if explicitly mentioned, otherwise it's just rain
+    if (lowerText.includes('flood') || lowerText.includes('flooding') || lowerText.includes('inundat')) {
+      return 'flood'
+    }
+    return 'rain'
+  }
+
+  // 7. Check for Flood (Explicit)
+  if (lowerText.includes('flood') || lowerText.includes('flooding') || lowerText.includes('inundat')) {
+    return 'flood'
+  }
+
+  // 8. Other specific types
   if (lowerText.includes('drought') || lowerText.includes('water shortage') || lowerText.includes('scarcity')) {
     return 'drought'
   }
@@ -87,18 +111,8 @@ function detectDisasterType(text: string): DisasterType {
   if (lowerText.includes('landslide') || lowerText.includes('mudslide') || lowerText.includes('rockfall')) {
     return 'landslide'
   }
-  // Cold wave is a type of disaster (extreme weather)
-  if (lowerText.includes('cold wave') || lowerText.includes('cold wave conditions') ||
-    lowerText.includes('शीत लहर') || lowerText.includes('कोल्ड डे')) {
-    return 'coldwave'
-  }
 
-  // Default: rain/thunderstorm alerts are weather-related, map to flood if heavy
-  if (lowerText.includes('rain') || lowerText.includes('thunderstorm') || lowerText.includes('thunder')) {
-    return 'flood' // Heavy rain can cause flooding
-  }
-
-  return 'flood' // default
+  return 'rain' // Default to rain for general weather alerts instead of flood
 }
 
 // Detect severity from text (used as fallback when CAP severity not available)
@@ -144,10 +158,11 @@ function mapCAPEventToType(eventCode: string, event: string): DisasterType {
     lowerEvent.includes('explosion') || lowerEvent.includes('blast') || lowerCode.includes('fire')) return 'fire'
   if (lowerEvent.includes('landslide') || lowerEvent.includes('mudslide') || lowerCode.includes('landslide')) return 'landslide'
   if (lowerEvent.includes('thunderstorm') || lowerEvent.includes('thunder') || lowerCode.includes('thunder')) return 'thunderstorm'
+  if (lowerEvent.includes('rain') || lowerCode.includes('rain')) return 'rain'
   if (lowerEvent.includes('heat wave') || lowerEvent.includes('heatwave') || lowerCode.includes('heat')) return 'heatwave'
   if (lowerEvent.includes('cold wave') || lowerEvent.includes('coldwave') || lowerCode.includes('cold')) return 'coldwave'
 
-  return 'flood' // default
+  return 'rain' // default
 }
 
 // Map CAP severity to our severity levels
@@ -159,17 +174,6 @@ function mapCAPSeverity(severity: string): Severity {
   if (lower === 'minor') return 'medium'
 
   return 'low'
-}
-
-// Helper to safely extract string content from XML object or string
-function getStringContent(val: unknown): string {
-  if (val === null || val === undefined) return ''
-  if (typeof val === 'string') return val
-  if (typeof val === 'object' && val !== null) {
-    const v = val as Record<string, unknown>
-    return String(v['#text'] || v.text || v.content || '')
-  }
-  return String(val)
 }
 
 // Parse CAP XML/JSON alert
@@ -254,7 +258,7 @@ function parseCAPAlert(alert: Record<string, any>): Disaster | null {
  * Uses RSS feed format with CAP data embedded
  */
 export async function fetchDisastersFromSACHET(): Promise<Disaster[]> {
-  // console.log('Fetching today\'s disasters from official NDMA SACHET RSS Feed...')
+  console.log('🔄 Fetching today\'s disasters from official NDMA SACHET RSS Feed...')
 
   try {
     const disasters: Disaster[] = []
@@ -270,6 +274,8 @@ export async function fetchDisastersFromSACHET(): Promise<Disaster[]> {
 
     // Fallback: Public CORS proxy (unreliable, may be down)
     const CORS_PROXY = 'https://api.allorigins.win/raw?url='
+
+    console.log('📍 Using Vite proxy:', USE_VITE_PROXY, '| Fetch URL:', USE_VITE_PROXY ? VITE_PROXY_PATH : `${CORS_PROXY}${encodeURIComponent(SACHET_RSS_URL)}`)
 
     // Get today's date for filtering
     const today = new Date()
@@ -326,22 +332,28 @@ export async function fetchDisastersFromSACHET(): Promise<Disaster[]> {
         }
       })
 
+      console.log('✅ SACHET API Response:', response.status, response.statusText)
+
       if (!response.ok) {
         throw new Error(`SACHET RSS feed returned ${response.status}: ${response.statusText}`)
       }
 
       const xmlText = await response.text()
+      console.log('📄 XML Response length:', xmlText.length, 'chars | Starts with:', xmlText.substring(0, 50))
+
       const parser = new DOMParser()
       const xmlDoc = parser.parseFromString(xmlText, 'text/xml')
 
       // Check for parse errors
       const parseError = xmlDoc.querySelector('parsererror')
       if (parseError) {
+        console.error('❌ XML Parse Error:', parseError.textContent)
         throw new Error('Failed to parse RSS XML feed')
       }
 
       // Try to parse as RSS feed first
       const rssItems = xmlDoc.querySelectorAll('rss channel item, feed entry, item')
+      console.log('📰 Found RSS items:', rssItems.length)
 
       if (rssItems.length > 0) {
         // This is an RSS feed - parse RSS items
@@ -482,60 +494,19 @@ export async function fetchDisastersFromSACHET(): Promise<Disaster[]> {
         return isLiveOrToday(disaster.reportedAt, disaster.expires)
       })
 
+      console.log('✨ Successfully extracted', activeDisasters.length, 'active disasters from SACHET')
 
       return activeDisasters
     } catch (error) {
-      console.error(`Error fetching from SACHET RSS feed:`, error)
+      console.error(`❌ Error fetching from SACHET RSS feed:`, error)
       throw error // Re-throw to be handled by caller
     }
   } catch (error) {
-    console.error('Error fetching from SACHET:', error)
+    console.error('❌ Error fetching from SACHET:', error)
     return []
   }
 }
 
-// Helper to convert XML element to object
-function xmlToObject(element: Element): Record<string, any> | string {
-  const obj: Record<string, any> = {}
-
-  // Get text content
-  if (element.childNodes.length === 1 && element.childNodes[0].nodeType === 3) {
-    return element.textContent
-  }
-
-  // Get attributes
-  for (let i = 0; i < element.attributes.length; i++) {
-    const attr = element.attributes[i]
-    obj[`@${attr.name}`] = attr.value
-  }
-
-  // Get child elements
-  const children = element.children
-  for (let i = 0; i < children.length; i++) {
-    const child = children[i]
-    const childObj = xmlToObject(child)
-    const tagName = child.tagName
-
-    if (obj[tagName]) {
-      if (!Array.isArray(obj[tagName])) {
-        obj[tagName] = [obj[tagName]]
-      }
-      obj[tagName].push(childObj)
-    } else {
-      obj[tagName] = childObj
-    }
-  }
-
-  // Add text content if exists
-  const text = element.textContent?.trim()
-  if (text && Object.keys(obj).length === 0) {
-    return text
-  } else if (text) {
-    obj['#text'] = text
-  }
-
-  return obj
-}
 
 // Main function to get all disasters from SACHET
 export async function fetchAllDisasters(): Promise<Disaster[]> {

@@ -9,16 +9,16 @@ interface NewsTickerProps {
     onDisasterSelect: (disaster: Disaster) => void
 }
 
-const NewsTicker: React.FC<NewsTickerProps> = ({ disasters, onDisasterSelect }) => {
+const NewsTicker: React.FC<NewsTickerProps> = React.memo(({ disasters, onDisasterSelect }) => {
     // Filter for meaningful updates
-    const updates = disasters.slice(0, 10).map(d => {
+    const updates = React.useMemo(() => disasters.slice(0, 10).map(d => {
         const { displayTitle } = getSmartDisasterDetails(d)
         return {
             id: d.id,
             original: d,
             text: `${displayTitle} reported in ${d.location.state} • Severity: ${d.severity.toUpperCase()}`
         }
-    })
+    }), [disasters])
 
     if (updates.length === 0) return null
 
@@ -53,6 +53,6 @@ const NewsTicker: React.FC<NewsTickerProps> = ({ disasters, onDisasterSelect }) 
             </div>
         </div>
     )
-}
+})
 
 export default NewsTicker

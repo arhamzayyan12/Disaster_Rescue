@@ -12,6 +12,7 @@ export const DISASTER_ICONS: Record<string, string> = {
     coldwave: 'ac_unit',
     fog: 'foggy',
     pollution: 'masks',
+    rain: 'rainy',
     default: 'warning'
 };
 
@@ -34,6 +35,7 @@ export const DISASTER_TYPE_COLORS: Record<string, string> = {
     coldwave: '#FFFFFF', // White
     fog: '#9E9E9E', // Grey
     pollution: '#616161', // Dark Grey
+    rain: '#448AFF', // Light Blue
     default: '#607D8B'
 };
 

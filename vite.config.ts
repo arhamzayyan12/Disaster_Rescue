@@ -19,7 +19,26 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api\/ogd/, ''),
         secure: false,
       },
-
+    }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-leaflet': ['leaflet', 'react-leaflet'],
+          'vendor-motion': ['framer-motion'],
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
     }
   }
 })

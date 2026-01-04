@@ -11,7 +11,7 @@ interface HeaderProps {
     onLoginClick: () => void
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLoginClick }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ activeTab, onTabChange, onLoginClick }) => {
     const { user, isAuthenticated, logout } = useAuth()
 
     const navItems: Array<{ id: TabType; label: string }> = [
@@ -104,7 +104,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLoginClick })
             </div>
         </header>
     )
-}
+})
 
 export default Header
 

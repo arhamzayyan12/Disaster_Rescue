@@ -14,7 +14,6 @@ import { useDisasterProcessor, EnrichedDisaster } from '../hooks/useDisasterProc
 
 import './DisasterMap.css'
 
-
 // Fix for default marker icon in React Leaflet
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -45,55 +44,51 @@ interface DisasterMapProps {
   activeFilter: string
 }
 
-
-
 // --- OPTIMIZATION: Icon Caching & Helpers defined outside component ---
 
 // Icon Cache to prevent recreating L.divIcon on every render
 const iconCache: Record<string, L.DivIcon> = {};
 
 const getDisasterIcon = (disaster: Disaster | EnrichedDisaster) => {
-  // Normalize type to lowercase to ensure matching
   const type = (disaster as EnrichedDisaster).smartAnalysis?.effectiveType?.toLowerCase() || disaster.type.toLowerCase();
-  const key = `${type}-${disaster.severity}`;
+  const severity = disaster.severity.toLowerCase();
+  const key = `${type}-${severity}`;
 
   if (!iconCache[key]) {
     const iconName = getDisasterIconName(type);
     const typeColor = getDisasterTypeColor(type);
-    const severityColor = getSeverityColor(disaster.severity);
+    const severityColor = getSeverityColor(severity);
 
-    // For white/light backgrounds (like coldwave), use dark icon text
-    const isLightBackground = type === 'coldwave' || type === 'fog' || type === 'snow';
-    const iconTextColor = isLightBackground ? '#333' : 'white';
+    const isLightBackground = type === 'coldwave' || type === 'fog' || type === 'snow' || type === 'white';
+    const iconTextColor = isLightBackground ? '#1a1a1a' : 'white';
 
+    // Premium Vibrant Style with Pulse Animation
     const iconHtml = `
-      <div style="
-        background-color: ${typeColor};
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 3px solid ${severityColor};
-        box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: ${iconTextColor};
-      ">
-        <span class="material-symbols-outlined" style="font-size: 20px;">${iconName}</span>
+      <div class="marker-wrapper">
+        <div class="marker-pulse marker-pulse-${severity}"></div>
+        <div class="marker-icon-inner" style="
+          background: ${typeColor};
+          border: 2px solid ${severityColor};
+          box-shadow: 0 0 15px ${severityColor}44, inset 0 0 10px rgba(255,255,255,0.2);
+          color: ${iconTextColor};
+        ">
+          <span class="material-symbols-outlined" style="font-size: 20px; font-weight: 500;">${iconName}</span>
+        </div>
       </div>
     `
     iconCache[key] = L.divIcon({
-      className: 'custom-disaster-marker',
+      className: 'premium-disaster-marker',
       html: iconHtml,
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
-      popupAnchor: [0, -20]
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
+      popupAnchor: [0, -22]
     });
   }
 
   return iconCache[key];
 }
 
+// Custom Cluster Icon for a premium look
 const getShelterIcon = (amenity: string = 'general') => {
   const normAmenity = amenity.toLowerCase();
 
@@ -316,6 +311,7 @@ const DisasterMap: React.FC<DisasterMapProps> = memo(({
             center={mapCenter}
             zoom={selectedDisaster ? 9 : defaultZoom}
           />
+
           {displayedDisasters
             .filter((disaster) => {
               // Filter out disasters with invalid coordinates
@@ -330,7 +326,6 @@ const DisasterMap: React.FC<DisasterMapProps> = memo(({
             .map((disaster) => (
               <Marker
                 key={disaster.id}
-                title={(disaster as EnrichedDisaster).smartAnalysis?.effectiveType || disaster.type}
                 position={[disaster.location.lat, disaster.location.lng]}
                 icon={getDisasterIcon(disaster)}
                 eventHandlers={{

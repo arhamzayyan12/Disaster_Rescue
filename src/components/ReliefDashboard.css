@@ -115,6 +115,7 @@
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s;
+    color: #ffffff;
 }
 
 .need-card:hover {
@@ -125,15 +126,24 @@
     background: rgba(59, 130, 246, 0.1);
     border-color: var(--primary);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+    color: #ffffff;
 }
 
 .need-icon {
     font-size: 2.5rem;
     margin-bottom: 0.75rem;
-    color: var(--primary);
+    color: #ffffff;
+    transition: color 0.2s;
+}
+
+.need-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
 }
 
 .need-card.selected .need-icon {
+    color: var(--primary);
     text-shadow: 0 0 10px var(--primary-glow);
 }
 

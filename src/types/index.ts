@@ -1,4 +1,4 @@
-export type DisasterType = 'flood' | 'earthquake' | 'cyclone' | 'drought' | 'fire' | 'landslide' | 'thunderstorm' | 'heatwave' | 'coldwave'
+export type DisasterType = 'flood' | 'earthquake' | 'cyclone' | 'drought' | 'fire' | 'landslide' | 'thunderstorm' | 'heatwave' | 'coldwave' | 'rain'
 
 export type Severity = 'low' | 'medium' | 'high' | 'critical'
 
