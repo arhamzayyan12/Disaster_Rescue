@@ -57,12 +57,12 @@ const VolunteerDashboard: React.FC<VolunteerDashboardProps> = ({
                             <tbody>
                                 {filteredRequests.map(req => (
                                     <tr key={req.id}>
-                                        <td>
+                                        <td data-label="Type">
                                             <div className="font-medium text-white">{req.type.charAt(0).toUpperCase() + req.type.slice(1)}</div>
                                             <div className="text-xs text-gray-500">{req.urgency.toUpperCase()}</div>
                                         </td>
-                                        <td>{req.location.address?.slice(0, 20)}...</td>
-                                        <td>
+                                        <td data-label="Location">{req.location.address?.slice(0, 20)}...</td>
+                                        <td data-label="Status">
                                             <span className={`status-badge ${req.status}`}>
                                                 {req.status.replace('-', ' ').toUpperCase()}
                                             </span>

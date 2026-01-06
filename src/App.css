@@ -39,12 +39,13 @@
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
-    padding-bottom: 50px;
+    padding-bottom: 32px;
+    /* Matches mobile ticker height */
   }
 
   .main-content {
-    height: calc(100vh - 110px);
-    height: calc(100dvh - 110px);
+    height: calc(100dvh - 60px - 32px);
+    /* Header ~60px, Ticker 32px */
   }
 
   .main-content.scrollable {

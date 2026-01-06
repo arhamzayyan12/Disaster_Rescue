@@ -13,6 +13,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = React.memo(({ activeTab, onTabChange, onLoginClick }) => {
     const { user, isAuthenticated, logout } = useAuth()
+    const [isMenuOpen, setIsMenuOpen] = React.useState(false)
 
     const navItems: Array<{ id: TabType; label: string }> = [
         { id: 'map', label: 'Map Dashboard' },
@@ -21,6 +22,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ activeTab, onTabChange, onLo
         { id: 'guidelines', label: 'Safety Guide' },
         { id: 'news', label: 'Live News' },
     ]
+
+    const handleTabClick = (tabId: TabType) => {
+        onTabChange(tabId)
+        setIsMenuOpen(false)
+    }
 
     return (
         <header className="app-header">
@@ -39,12 +45,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ activeTab, onTabChange, onLo
             </div>
 
             <div className="header-right">
-                <div className="nav-links">
+                <div className={`nav-links ${isMenuOpen ? 'mobile-open' : ''}`}>
                     {navItems.map((item) => (
                         <button
                             key={item.id}
                             className={`nav-link ${activeTab === item.id ? 'active' : ''}`}
-                            onClick={() => onTabChange(item.id)}
+                            onClick={() => handleTabClick(item.id)}
                             style={{ position: 'relative' }}
                             aria-label={`Navigate to ${item.label}`}
                             aria-current={activeTab === item.id ? 'page' : undefined}
@@ -59,48 +65,65 @@ const Header: React.FC<HeaderProps> = React.memo(({ activeTab, onTabChange, onLo
                             )}
                         </button>
                     ))}
+                    {isAuthenticated && (
+                        <button className="nav-link md:hidden" onClick={() => { logout(); setIsMenuOpen(false); }}>
+                            Logout
+                        </button>
+                    )}
                 </div>
 
-                {isAuthenticated && user ? (
-                    <div className="user-profile">
-                        <div className="user-info">
-                            <span className="user-name">{user.name}</span>
-                            <span className="user-role">{user.role}</span>
+                <div className="flex items-center gap-4">
+                    {isAuthenticated && user ? (
+                        <div className="user-profile">
+                            <div className="user-info">
+                                <span className="user-name">{user.name}</span>
+                                <span className="user-role">{user.role}</span>
+                            </div>
+                            {user.avatarUrl ? (
+                                <img
+                                    src={user.avatarUrl}
+                                    alt={user.name}
+                                    className="user-avatar"
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                    }}
+                                />
+                            ) : null}
+                            <div className={`user-avatar-placeholder ${user.avatarUrl ? 'hidden' : ''}`}>
+                                {user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="header-logout-btn hidden md:flex"
+                                onClick={logout}
+                                title="Logout"
+                            >
+                                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>logout</span>
+                            </motion.button>
                         </div>
-                        {user.avatarUrl ? (
-                            <img
-                                src={user.avatarUrl}
-                                alt={user.name}
-                                className="user-avatar"
-                                onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                                }}
-                            />
-                        ) : null}
-                        <div className={`user-avatar-placeholder ${user.avatarUrl ? 'hidden' : ''}`}>
-                            {user.name.charAt(0).toUpperCase()}
-                        </div>
+                    ) : (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="header-logout-btn"
-                            onClick={logout}
-                            title="Logout"
+                            className="header-login-btn"
+                            onClick={onLoginClick}
                         >
-                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>logout</span>
+                            Login
                         </motion.button>
-                    </div>
-                ) : (
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="header-login-btn"
-                        onClick={onLoginClick}
+                    )}
+
+                    <button
+                        className="mobile-menu-toggle md:hidden"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Toggle menu"
                     >
-                        Login
-                    </motion.button>
-                )}
+                        <span className="material-symbols-outlined">
+                            {isMenuOpen ? 'close' : 'menu'}
+                        </span>
+                    </button>
+                </div>
             </div>
         </header>
     )

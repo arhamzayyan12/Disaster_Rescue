@@ -164,14 +164,14 @@ const DisasterAnalytics: React.FC<DisasterAnalyticsProps> = ({ disasters }) => {
                         <tbody>
                             {disasters.slice(0, 10).map(d => (
                                 <tr key={d.id}>
-                                    <td>
+                                    <td data-label="Status">
                                         <span className={`status-dot ${d.severity}`}></span>
                                         {d.status.toUpperCase()}
                                     </td>
-                                    <td>{d.type.charAt(0).toUpperCase() + d.type.slice(1)}</td>
-                                    <td>{d.location.name}, {d.location.state}</td>
-                                    <td>{new Date(d.reportedAt).toLocaleDateString()}</td>
-                                    <td style={{ color: getSeverityColor(d.severity) }}>
+                                    <td data-label="Type">{d.type.charAt(0).toUpperCase() + d.type.slice(1)}</td>
+                                    <td data-label="Location">{d.location.name}, {d.location.state}</td>
+                                    <td data-label="Reported">{new Date(d.reportedAt).toLocaleDateString()}</td>
+                                    <td data-label="Severity" style={{ color: getSeverityColor(d.severity) }}>
                                         {d.severity.toUpperCase()}
                                     </td>
                                 </tr>

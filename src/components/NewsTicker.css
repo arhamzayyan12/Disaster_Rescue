@@ -76,3 +76,27 @@
     color: var(--text-white);
     background: rgba(255, 255, 255, 0.05);
 }
+
+@media (max-width: 768px) {
+    .news-ticker-container {
+        height: 32px;
+    }
+
+    .ticker-label {
+        padding: 0 0.75rem;
+    }
+
+    .ticker-label {
+        font-size: 0;
+        /* Hide text but keep container sizing */
+    }
+
+    .ticker-label span.material-symbols-outlined {
+        font-size: 18px;
+    }
+
+    .ticker-item {
+        padding: 0 1.5rem;
+        font-size: 0.75rem;
+    }
+}

@@ -61,6 +61,7 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
     onCanHelp
 }) => {
     const [showHub, setShowHub] = React.useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
 
     React.useEffect(() => {
         const hasSeenHub = sessionStorage.getItem('hasSeenEmergencyHub')
@@ -110,17 +111,27 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
         setActiveFilter(prev => prev === filter ? 'total' : filter)
     }
 
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen)
+    }
+
     return (
-        <div className="map-dashboard-container" style={{ display: 'flex', height: '100%', width: '100%' }}>
-            <Sidebar
-                stats={stats}
-                layers={layers}
-                onToggleLayer={onToggleLayer}
-                recentAlerts={recentAlerts}
-                onAlertClick={onDisasterSelect}
-                activeFilter={activeFilter}
-                onStatClick={handleStatClick}
-            />
+        <div className="map-dashboard-container" style={{ display: 'flex', height: '100%', width: '100%', position: 'relative' }}>
+            <div className={`sidebar-wrapper ${isSidebarOpen ? 'mobile-open' : ''}`}>
+                <Sidebar
+                    stats={stats}
+                    layers={layers}
+                    onToggleLayer={onToggleLayer}
+                    recentAlerts={recentAlerts}
+                    onAlertClick={(d) => { onDisasterSelect(d); setIsSidebarOpen(false); }}
+                    activeFilter={activeFilter}
+                    onStatClick={handleStatClick}
+                />
+                <button className="sidebar-close-btn md:hidden" onClick={() => setIsSidebarOpen(false)}>
+                    <span className="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
             <div style={{ flex: 1, position: 'relative' }}>
                 <Suspense fallback={<MapLoading />}>
                     <DisasterMap
@@ -132,6 +143,15 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
                         activeFilter={activeFilter}
                     />
                 </Suspense>
+
+                {/* Mobile Sidebar Toggle */}
+                <button
+                    className="mobile-sidebar-toggle md:hidden"
+                    onClick={toggleSidebar}
+                    aria-label="Toggle filters"
+                >
+                    <span className="material-symbols-outlined">filter_list</span>
+                </button>
             </div>
 
             <AnimatePresence>

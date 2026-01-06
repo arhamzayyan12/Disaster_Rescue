@@ -232,3 +232,25 @@
   z-index: 900;
   background: #0a0a0a;
 }
+
+@media (max-width: 768px) {
+  .map-controls-overlay {
+    top: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .wind-toggle-btn {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .leaflet-popup-content-wrapper {
+    padding: 0;
+  }
+
+  .info-window-content {
+    min-width: 150px;
+    padding: 0.5rem;
+  }
+}
