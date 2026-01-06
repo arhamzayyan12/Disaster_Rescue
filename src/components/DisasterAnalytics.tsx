@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { Disaster } from '../types'
 import { getDisasterTypeColor as getTypeColor, getSeverityColor } from '../utils/disaster-utils'
+import { useRelief } from '../contexts/ReliefContext'
 import './DisasterAnalytics.css'
 
 interface DisasterAnalyticsProps {
@@ -8,17 +9,26 @@ interface DisasterAnalyticsProps {
 }
 
 const DisasterAnalytics: React.FC<DisasterAnalyticsProps> = ({ disasters }) => {
+    const { requests } = useRelief()
+
     // Aggregate Data
     const totalIncidents = disasters.length
     const activeIncidents = useMemo(() =>
         disasters.filter(d => d.status === 'active').length
         , [disasters])
 
-    // Mock Data for "Story" elements - Memoized to prevent random values changing on re-render
-    const { livesImpacted, fundsRaised } = useMemo(() => ({
-        livesImpacted: Math.floor(totalIncidents * 1240),
-        fundsRaised: Math.floor(totalIncidents * 5.2)
-    }), [totalIncidents])
+    // Calculate funds from real-time context
+    const { fundsRaised, fundingGoal } = useMemo(() => {
+        const raised = requests
+            .filter(r => r.status === 'fulfilled' && r.amount)
+            .reduce((sum, r) => sum + (Number(r.amount) || 0), 0)
+
+        const goal = requests
+            .filter(r => r.status !== 'cancelled' && r.amount)
+            .reduce((sum, r) => sum + (Number(r.amount) || 0), 0)
+
+        return { fundsRaised: raised, fundingGoal: goal }
+    }, [requests])
 
     // Type Breakdown
     const typeCounts = useMemo(() => disasters.reduce((acc, curr) => {
@@ -37,6 +47,9 @@ const DisasterAnalytics: React.FC<DisasterAnalyticsProps> = ({ disasters }) => {
     const topLocations = useMemo(() => Object.entries(locationCounts)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 5), [locationCounts])
+
+    // Calculate Affected Areas (unique locations)
+    const affectedAreas = Object.keys(locationCounts).length
 
     const maxCount = useMemo(() => Math.max(...Object.values(typeCounts), 1), [typeCounts])
 
@@ -57,33 +70,33 @@ const DisasterAnalytics: React.FC<DisasterAnalyticsProps> = ({ disasters }) => {
                 <div className="kpi-card">
                     <span className="kpi-label">Total Incidents</span>
                     <span className="kpi-value">{totalIncidents}</span>
-                    <span className="kpi-trend up">
-                        <span className="material-symbols-outlined text-sm">trending_up</span>
-                        +12% vs last month
+                    <span className="kpi-trend neutral">
+                        <span className="material-symbols-outlined text-sm">update</span>
+                        Live Data
                     </span>
                 </div>
 
                 <div className="kpi-card">
                     <span className="kpi-label">Active Alerts</span>
                     <span className="kpi-value">{activeIncidents}</span>
-                    <span className="kpi-trend down">
-                        <span className="material-symbols-outlined text-sm">trending_down</span>
-                        -5% since yesterday
+                    <span className="kpi-trend neutral">
+                        <span className="material-symbols-outlined text-sm">notifications_active</span>
+                        Live Updates
                     </span>
                 </div>
 
                 <div className="kpi-card">
-                    <span className="kpi-label">Lives Impacted (Est.)</span>
-                    <span className="kpi-value">{livesImpacted.toLocaleString()}</span>
+                    <span className="kpi-label">Affected Areas</span>
+                    <span className="kpi-value">{affectedAreas}</span>
                     <span className="kpi-label text-xs mt-1">across {Object.keys(locationCounts).length} regions</span>
                 </div>
 
                 <div className="kpi-card">
                     <span className="kpi-label">Relief Funds Raised</span>
-                    <span className="kpi-value">₹{fundsRaised}Cr</span>
-                    <span className="kpi-trend up">
+                    <span className="kpi-value">₹{fundsRaised.toLocaleString()}</span>
+                    <span className="kpi-trend neutral">
                         <span className="material-symbols-outlined text-sm">payments</span>
-                        Goal: ₹{(fundsRaised * 1.5).toFixed(1)}Cr
+                        Goal: ₹{fundingGoal.toLocaleString()}
                     </span>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import { ReliefRequest, ReliefRequestType, RequestStatus } from '../types/relief'
 import { supabase } from '../lib/supabase'
+import { RealtimeChannel } from '@supabase/supabase-js'
 
 // Map DB row to ReliefRequest interface
 const mapFromDb = (row: any): ReliefRequest => ({
@@ -293,4 +294,24 @@ export async function updateUserProfile(userId: string, updates: {
         throw error
     }
     return data
+}
+
+/**
+ * Subscribe to real-time changes in relief requests
+ */
+export function subscribeToReliefRequests(onUpdate: (payload: any) => void): RealtimeChannel {
+    return supabase
+        .channel('public:relief_requests')
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'relief_requests'
+            },
+            (payload) => {
+                onUpdate(payload);
+            }
+        )
+        .subscribe();
 }

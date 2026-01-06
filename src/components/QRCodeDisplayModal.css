@@ -188,9 +188,16 @@
 
 .qr-display-image {
     max-width: 100%;
-    max-height: 350px;
+    max-height: 60vh;
+    /* Increased from 350px to view more on larger screens */
+    width: auto;
+    /* Ensure width adjusts automatically */
+    height: auto;
+    /* Ensure height adjusts automatically */
     object-fit: contain;
     display: block;
+    margin: 0 auto;
+    /* Center the image */
 }
 
 .qr-display-upi-info {

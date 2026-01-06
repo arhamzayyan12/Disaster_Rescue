@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { ReliefRequest, ReliefRequestType, RequestUrgency } from '../types/relief'
 import {
-    getAllReliefRequests,
     createReliefRequest,
     respondToRequest,
     fulfillRequest,
@@ -13,6 +12,7 @@ import VolunteerDashboard from './relief/VolunteerDashboard'
 import QRCodeDisplayModal from './QRCodeDisplayModal'
 import { useToast } from './Toast'
 import { useAuth } from '../contexts/AuthContext'
+import { useRelief } from '../contexts/ReliefContext'
 import './ReliefDashboard.css'
 
 interface ReliefDashboardProps {
@@ -25,15 +25,9 @@ type UserMode = 'victim' | 'volunteer'
 const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initialMode }) => {
     const toast = useToast()
     const { user, isAuthenticated, loading } = useAuth()
+    const { requests, loading: requestsLoading, refreshRequests: loadRequests } = useRelief()
+
     const [mode, setMode] = useState<UserMode>(initialMode || user?.role || 'volunteer')
-
-    useEffect(() => {
-        if (initialMode) {
-            setMode(initialMode)
-        }
-    }, [initialMode])
-
-    const [requests, setRequests] = useState<ReliefRequest[]>([])
     const [filter, setFilter] = useState<'all' | 'pending' | 'in-progress' | 'fulfilled'>('pending')
     const [selectedRequest, setSelectedRequest] = useState<ReliefRequest | null>(null)
     const [showQRModal, setShowQRModal] = useState(false)
@@ -52,6 +46,12 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
     })
 
     useEffect(() => {
+        if (initialMode) {
+            setMode(initialMode)
+        }
+    }, [initialMode])
+
+    useEffect(() => {
         if (user) {
             setMode(user.role)
             // Load saved QR code from Cloud Profile
@@ -68,21 +68,6 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
             loadProfile()
         }
     }, [user])
-
-    const loadRequests = useCallback(async () => {
-        try {
-            const data = await getAllReliefRequests()
-            setRequests(data)
-        } catch (error) {
-            console.error('Failed to load relief requests:', error)
-        }
-    }, [])
-
-    useEffect(() => {
-        loadRequests()
-        const interval = setInterval(loadRequests, 30000) // Refresh every 30s
-        return () => clearInterval(interval)
-    }, [loadRequests])
 
     const filteredRequests = useMemo(() => requests.filter(req => {
         if (filter === 'all') return true
@@ -125,19 +110,19 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
                 qrCodeImage: formData.qrCodeImage
             })
             toast.success('Request submitted successfully.')
+            // No need to call loadRequests manually as subscription will handle it, 
+            // but calling it once doesn't hurt for immediate feedback
             loadRequests()
+
             // Reset form
-            setFormData({
+            setFormData(prev => ({
+                ...prev,
                 type: 'food' as ReliefRequestType,
                 urgency: 'high' as RequestUrgency,
-                victimName: '',
-                victimContact: '',
                 address: '',
                 description: '',
                 amount: '',
-                upiId: '',
-                qrCodeImage: ''
-            })
+            }))
         } catch (error) {
             toast.error('Failed to submit request')
         }
@@ -203,10 +188,10 @@ const ReliefDashboard: React.FC<ReliefDashboardProps> = ({ userLocation, initial
             </div>
 
             <div className="relief-content">
-                {loading ? (
+                {(loading || (requestsLoading && requests.length === 0)) ? (
                     <div className="flex flex-col items-center justify-center h-full pb-20">
                         <div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4"></div>
-                        <p className="text-gray-400 font-medium">Verifying Credentials...</p>
+                        <p className="text-gray-400 font-medium">Synchronizing Rescue Data...</p>
                     </div>
                 ) : mode === 'victim' ? (
                     <VictimForm

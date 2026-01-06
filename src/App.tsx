@@ -7,6 +7,7 @@ import { Disaster } from './types'
 
 import { fetchAllDisasters } from './services/disaster-data-service'
 import { Analytics } from '@vercel/analytics/react'
+import { ReliefProvider } from './contexts/ReliefContext'
 import './App.css'
 
 // Lazy load heavy components
@@ -146,80 +147,82 @@ function App() {
   }, [fetchData])
 
   return (
-    <div className="app-container">
-      {!showAuthModal && (
-        <Header
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          onLoginClick={handleLoginClick}
-        />
-      )}
+    <ReliefProvider>
+      <div className="app-container">
+        {!showAuthModal && (
+          <Header
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onLoginClick={handleLoginClick}
+          />
+        )}
 
-      {!showAuthModal && (
-        <main className={`main-content ${['guidelines', 'news', 'analytics'].includes(activeTab) ? 'scrollable' : ''}`}>
-          {/* Map View - Keep outside Suspense to prevent unmounting/remounting issues */}
-          <div style={{ display: activeTab === 'map' ? 'block' : 'none', height: '100%', width: '100%' }}>
-            <MapDashboard
-              disasters={disasters}
-              selectedDisaster={selectedDisaster}
-              onDisasterSelect={handleDisasterSelect}
-              layers={layers}
-              onToggleLayer={handleToggleLayer}
-              onNeedHelp={handleNeedHelp}
-              onCanHelp={handleCanHelp}
-            />
-          </div>
-
-          {/* Relief View - Keep alive after first load */}
-          <div style={{ display: activeTab === 'relief' ? 'block' : 'none', height: '100%', width: '100%' }}>
-            {(activeTab === 'relief' || reliefLoaded) && (
-              <Suspense fallback={<LoadingSpinner />}>
-                <ReliefDashboard userLocation={userLocation} initialMode={reliefMode} />
-              </Suspense>
-            )}
-          </div>
-
-          <Suspense fallback={<LoadingSpinner />}>
-            {/* Analytics View */}
-            {activeTab === 'analytics' && (
-              <DisasterAnalytics disasters={disasters} />
-            )}
-
-            {/* Guidelines View */}
-            {activeTab === 'guidelines' && (
-              <SafetyGuidelines />
-            )}
-
-            {/* News View */}
-            {activeTab === 'news' && (
-              <LiveNews
+        {!showAuthModal && (
+          <main className={`main-content ${['guidelines', 'news', 'analytics'].includes(activeTab) ? 'scrollable' : ''}`}>
+            {/* Map View - Keep outside Suspense to prevent unmounting/remounting issues */}
+            <div style={{ display: activeTab === 'map' ? 'block' : 'none', height: '100%', width: '100%' }}>
+              <MapDashboard
                 disasters={disasters}
-                isLoading={isLoading}
-                onDisasterSelect={handleNewsDisasterSelect}
+                selectedDisaster={selectedDisaster}
+                onDisasterSelect={handleDisasterSelect}
+                layers={layers}
+                onToggleLayer={handleToggleLayer}
+                onNeedHelp={handleNeedHelp}
+                onCanHelp={handleCanHelp}
               />
-            )}
-          </Suspense>
-        </main>
-      )}
+            </div>
 
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={handleAuthModalClose}
-        initialMode="login"
-      />
+            {/* Relief View - Keep alive after first load */}
+            <div style={{ display: activeTab === 'relief' ? 'block' : 'none', height: '100%', width: '100%' }}>
+              {(activeTab === 'relief' || reliefLoaded) && (
+                <Suspense fallback={<LoadingSpinner />}>
+                  <ReliefDashboard userLocation={userLocation} initialMode={reliefMode} />
+                </Suspense>
+              )}
+            </div>
 
-      {/* Global Intel Ticker */}
-      {!showAuthModal && (
-        <NewsTicker
-          disasters={disasters}
-          onDisasterSelect={handleTickerDisasterSelect}
+            <Suspense fallback={<LoadingSpinner />}>
+              {/* Analytics View */}
+              {activeTab === 'analytics' && (
+                <DisasterAnalytics disasters={disasters} />
+              )}
+
+              {/* Guidelines View */}
+              {activeTab === 'guidelines' && (
+                <SafetyGuidelines />
+              )}
+
+              {/* News View */}
+              {activeTab === 'news' && (
+                <LiveNews
+                  disasters={disasters}
+                  isLoading={isLoading}
+                  onDisasterSelect={handleNewsDisasterSelect}
+                />
+              )}
+            </Suspense>
+          </main>
+        )}
+
+        {/* Auth Modal */}
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={handleAuthModalClose}
+          initialMode="login"
         />
-      )}
 
-      {/* Vercel Analytics */}
-      <Analytics />
-    </div >
+        {/* Global Intel Ticker */}
+        {!showAuthModal && (
+          <NewsTicker
+            disasters={disasters}
+            onDisasterSelect={handleTickerDisasterSelect}
+          />
+        )}
+
+        {/* Vercel Analytics */}
+        <Analytics />
+      </div >
+    </ReliefProvider>
   )
 }
 

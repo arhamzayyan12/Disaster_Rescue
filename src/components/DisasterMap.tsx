@@ -12,6 +12,8 @@ import {
 } from '../utils/disaster-utils'
 import { useDisasterProcessor, EnrichedDisaster } from '../hooks/useDisasterProcessor'
 
+import { useRelief } from '../contexts/ReliefContext'
+import { ReliefRequest } from '../types/relief'
 import './DisasterMap.css'
 
 // Fix for default marker icon in React Leaflet
@@ -82,6 +84,52 @@ const getDisasterIcon = (disaster: Disaster | EnrichedDisaster) => {
       iconSize: [44, 44],
       iconAnchor: [22, 22],
       popupAnchor: [0, -22]
+    });
+  }
+
+  return iconCache[key];
+}
+
+const getReliefIcon = (request: ReliefRequest) => {
+  const type = request.type.toLowerCase();
+  const urgency = request.urgency.toLowerCase();
+  const status = request.status.toLowerCase();
+  const key = `relief-${type}-${urgency}-${status}`;
+
+  if (!iconCache[key]) {
+    let iconName = 'emergency';
+
+    if (type === 'food') iconName = 'restaurant';
+    if (type === 'medical') iconName = 'medical_services';
+    if (type === 'shelter') iconName = 'home_pin';
+    if (type === 'rescue') iconName = 'person_alert';
+    if (type === 'monetary') iconName = 'payments';
+
+    const urgencyColor = urgency === 'critical' ? '#ef4444' : urgency === 'high' ? '#f97316' : '#3b82f6';
+
+    // Dim icon if already in-progress or fulfilled
+    const opacity = status === 'pending' ? '1' : '0.6';
+    const borderStyle = status === 'fulfilled' ? 'solid' : 'dashed';
+
+    const iconHtml = `
+      <div class="marker-wrapper relief-marker" style="opacity: ${opacity}">
+        <div class="marker-pulse marker-pulse-${urgency}"></div>
+        <div class="marker-icon-inner" style="
+          background: ${urgencyColor};
+          border: 2px ${borderStyle} white;
+          box-shadow: 0 0 15px ${urgencyColor}66;
+          color: white;
+        ">
+          <span class="material-symbols-outlined" style="font-size: 18px;">${iconName}</span>
+        </div>
+      </div>
+    `
+    iconCache[key] = L.divIcon({
+      className: 'premium-relief-marker',
+      html: iconHtml,
+      iconSize: [36, 36],
+      iconAnchor: [18, 18],
+      popupAnchor: [0, -18]
     });
   }
 
@@ -180,6 +228,7 @@ const DisasterMap: React.FC<DisasterMapProps> = memo(({
   activeFilter
 }) => {
   const [showWindMap, setShowWindMap] = useState(false)
+  const { requests } = useRelief()
 
   // 1. PERFORMANCE: Process data ONCE when props change
   // This hook ensures we don't recalculate smart types on every render/scroll
@@ -350,7 +399,63 @@ const DisasterMap: React.FC<DisasterMapProps> = memo(({
               </Marker>
             ))}
 
-
+          {/* Real-time Relief Request Markers */}
+          {requests.map((request) => (
+            <Marker
+              key={request.id}
+              position={[request.location.lat, request.location.lng]}
+              icon={getReliefIcon(request)}
+            >
+              <Popup>
+                <div className="info-window-content">
+                  <h3 style={{ borderBottom: `3px solid #ef4444`, paddingBottom: '5px' }}>
+                    SOS: {request.type.toUpperCase()}
+                  </h3>
+                  <div className="relief-stat-badges" style={{ display: 'flex', gap: '5px', margin: '8px 0' }}>
+                    <span style={{
+                      fontSize: '10px',
+                      background: request.urgency === 'critical' ? '#fee2e2' : '#ffedd5',
+                      color: request.urgency === 'critical' ? '#991b1b' : '#9a3412',
+                      padding: '2px 6px',
+                      borderRadius: '10px',
+                      fontWeight: 'bold'
+                    }}>
+                      {request.urgency.toUpperCase()}
+                    </span>
+                    <span style={{
+                      fontSize: '10px',
+                      background: '#dcfce7',
+                      color: '#166534',
+                      padding: '2px 6px',
+                      borderRadius: '10px',
+                      fontWeight: 'bold'
+                    }}>
+                      {request.status.toUpperCase()}
+                    </span>
+                  </div>
+                  <p><strong>Victim:</strong> {request.victimName}</p>
+                  <p><strong>Description:</strong> {request.description}</p>
+                  <button
+                    className="popup-navigate-btn"
+                    onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${request.location.lat},${request.location.lng}`, '_blank')}
+                    style={{
+                      width: '100%',
+                      marginTop: '10px',
+                      padding: '8px',
+                      backgroundColor: '#ef4444',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Respond Now
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
 
           {layers.shelters && shelters
             .filter((shelter) => {
