@@ -15,7 +15,7 @@
   color: var(--text-white);
   overflow: hidden;
   padding-bottom: 40px;
-  /* Space for News Ticker */
+  /* Desktop ticker */
 }
 
 .main-content {
@@ -39,13 +39,13 @@
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
-    padding-bottom: 32px;
-    /* Matches mobile ticker height */
+    padding-bottom: calc(70px + 32px);
+    /* BottomNav(70px) + NewsTicker(32px) */
   }
 
   .main-content {
-    height: calc(100dvh - 60px - 32px);
-    /* Header ~60px, Ticker 32px */
+    height: calc(100dvh - 60px - 70px - 32px);
+    /* Header ~60px, BottomNav 70px, Ticker 32px */
   }
 
   .main-content.scrollable {

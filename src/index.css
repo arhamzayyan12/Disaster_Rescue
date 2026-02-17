@@ -16,43 +16,46 @@
 
 :root {
   /* --- The Obsidian Palette (Charcoal & Slate) --- */
-  --bg-dark: #0a0c10;
-  --bg-surface: #11141b;
-  --bg-card: #1c212b;
-  --bg-sidebar: #11141b;
+  --bg-dark: #07090c;
+  --bg-surface: #0f1218;
+  --bg-card: #151921;
+  --bg-sidebar: #0a0c10;
 
   /* --- Muted Neutrals & High-Contrast Accents --- */
   --primary: #94a3b8;
-  --primary-glow: rgba(148, 163, 184, 0.2);
+  --primary-glow: rgba(148, 163, 184, 0.15);
   --accent: #3b82f6;
-  --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  --accent-glow: rgba(59, 130, 246, 0.3);
+  --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --accent-glow: rgba(59, 130, 246, 0.25);
 
   /* --- Semantic Signals --- */
-  --status-critical: #f43f5e;
+  --status-critical: #e11d48;
   --status-high: #f59e0b;
-  --status-medium: #a855f7;
+  --status-medium: #9333ea;
   --status-low: #10b981;
 
-  --critical-gradient: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
-  --success-gradient: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  --critical-gradient: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+  --success-gradient: linear-gradient(135deg, #10b981 0%, #065f46 100%);
 
   /* --- Glassmorphism --- */
-  --glass-bg: rgba(10, 12, 16, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: blur(20px);
+  --glass-bg: rgba(7, 9, 12, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-blur: blur(24px);
 
   /* --- Typography --- */
-  --text-white: #f8fafc;
-  --text-primary: #f1f5f9;
+  --text-white: #ffffff;
+  --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-muted: #475569;
 
   /* --- Borders & Shadows --- */
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-bright: rgba(255, 255, 255, 0.12);
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.2);
+  --border-subtle: rgba(255, 255, 255, 0.03);
+  --border-bright: rgba(255, 255, 255, 0.08);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 25px rgba(59, 130, 246, 0.15);
 }
 
 * {
@@ -122,8 +125,13 @@ h4,
 
 /* Skeleton Shimmer Effect */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .skeleton {
@@ -139,6 +147,53 @@ h4,
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-lg);
+}
+
+/* --- Layout Utilities (Tailwind Equivalents) --- */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.block {
+  display: block !important;
+}
+
+.overflow-hidden {
+  overflow: hidden !important;
+}
+
+@media (min-width: 768px) {
+  .md\:flex {
+    display: flex !important;
+  }
+
+  .md\:block {
+    display: block !important;
+  }
+
+  .md\:hidden {
+    display: none !important;
+  }
 }
 
 #root {

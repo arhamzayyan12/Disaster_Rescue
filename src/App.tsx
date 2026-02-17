@@ -5,7 +5,8 @@ import AuthModal from './components/AuthModal'
 import NewsTicker from './components/NewsTicker'
 import { Disaster } from './types'
 
-import { fetchAllDisasters } from './services/disaster-data-service'
+import { fetchAllDisasters, subscribeToDisasters } from './services/disaster-data-service'
+import { FirmsIngestionService } from './services/firms-service'
 import { Analytics } from '@vercel/analytics/react'
 import { ReliefProvider } from './contexts/ReliefContext'
 import './App.css'
@@ -24,6 +25,8 @@ const LoadingSpinner = () => (
   </div>
 )
 
+import BottomNav from './components/BottomNav'
+
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('map')
   const [disasters, setDisasters] = useState<Disaster[]>([])
@@ -35,10 +38,11 @@ function App() {
   const [layers, setLayers] = useState({
     weather: true,
     disasters: true,
-    shelters: false
+    shelters: false,
+    wildfires: true
   })
 
-  const handleToggleLayer = useCallback((layer: 'weather' | 'disasters' | 'shelters') => {
+  const handleToggleLayer = useCallback((layer: 'weather' | 'disasters' | 'shelters' | 'wildfires') => {
     setLayers(prev => ({ ...prev, [layer]: !prev[layer] }))
   }, [])
 
@@ -139,11 +143,32 @@ function App() {
     }
   }, [])
 
-  // Auto-refresh
+  // Auto-refresh & Real-time Sync
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 600000) // 10 mins
-    return () => clearInterval(interval)
+
+    // 1. Subscribe to real-time database changes (Triggered by FIRMS or Admin)
+    const subscription = subscribeToDisasters((payload) => {
+      console.log('🌍 Real-time Disaster Sync:', payload.eventType)
+      fetchData() // Simple re-fetch for UI consistency
+    })
+
+    // 2. NASA FIRMS Periodic Ingestion
+    // Note: In production, this poller should run in a backend worker/Edge Function.
+    // We implement it here to satisfy the "Autonomous Intelligence" requirement for the demo.
+    const runFirmsIngest = () => {
+      FirmsIngestionService.ingestWildfireData()
+    }
+
+    runFirmsIngest() // Initial run
+    const firmsInterval = setInterval(runFirmsIngest, 15 * 60 * 1000) // Every 15 mins
+    const dataInterval = setInterval(fetchData, 600000) // Every 10 mins
+
+    return () => {
+      subscription.unsubscribe()
+      clearInterval(firmsInterval)
+      clearInterval(dataInterval)
+    }
   }, [fetchData])
 
   return (
@@ -158,9 +183,9 @@ function App() {
         )}
 
         {!showAuthModal && (
-          <main className={`main-content ${['guidelines', 'news', 'analytics'].includes(activeTab) ? 'scrollable' : ''}`}>
+          <main className={`main-content ${['news', 'analytics', 'relief'].includes(activeTab) ? 'scrollable' : ''}`}>
             {/* Map View - Keep outside Suspense to prevent unmounting/remounting issues */}
-            <div style={{ display: activeTab === 'map' ? 'block' : 'none', height: '100%', width: '100%' }}>
+            <div className={activeTab === 'map' ? 'flex-1 flex' : 'hidden'} style={{ height: '100%', width: '100%' }}>
               <MapDashboard
                 disasters={disasters}
                 selectedDisaster={selectedDisaster}
@@ -211,11 +236,20 @@ function App() {
           initialMode="login"
         />
 
-        {/* Global Intel Ticker */}
+        {/* Global Intel Ticker - Modified to sit above bottom nav on mobile */}
         {!showAuthModal && (
           <NewsTicker
             disasters={disasters}
             onDisasterSelect={handleTickerDisasterSelect}
+          />
+        )}
+
+        {/* Mobile Bottom Navigation */}
+        {!showAuthModal && (
+          <BottomNav
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onLoginClick={handleLoginClick}
           />
         )}
 

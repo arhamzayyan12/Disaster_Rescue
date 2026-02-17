@@ -17,6 +17,14 @@ export interface Disaster {
   expires?: string
   affectedPeople?: number
   status: 'active' | 'contained' | 'resolved'
+  source?: string
+  confidence?: number
+  metadata?: {
+    frp?: number
+    detectionsCount?: number
+    satellite?: string
+    [key: string]: any
+  }
 }
 
 export interface Shelter {

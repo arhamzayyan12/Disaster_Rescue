@@ -15,8 +15,9 @@ interface MapDashboardProps {
         weather: boolean
         disasters: boolean
         shelters: boolean
+        wildfires: boolean
     }
-    onToggleLayer: (layer: 'weather' | 'disasters' | 'shelters') => void
+    onToggleLayer: (layer: 'weather' | 'disasters' | 'shelters' | 'wildfires') => void
     onNeedHelp: () => void
     onCanHelp: () => void
 }
@@ -28,26 +29,20 @@ const MapLoading = () => (
         alignItems: 'center',
         height: '100%',
         width: '100%',
-        backgroundColor: '#f5f5f5',
-        color: '#666',
+        backgroundColor: '#0a0c10',
+        color: '#fff',
         flexDirection: 'column',
         gap: '10px'
     }}>
         <div className="spinner" style={{
             width: '30px',
             height: '30px',
-            border: '3px solid #ddd',
-            borderTop: '3px solid #2196F3',
+            border: '3px solid #333',
+            borderTop: '3px solid #3b82f6',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
         }}></div>
-        <span>Loading Map...</span>
-        <style>{`
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        `}</style>
+        <span>Syncing Map Intel...</span>
     </div>
 )
 
@@ -61,7 +56,6 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
     onCanHelp
 }) => {
     const [showHub, setShowHub] = React.useState(false)
-    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
 
     React.useEffect(() => {
         const hasSeenHub = sessionStorage.getItem('hasSeenEmergencyHub')
@@ -75,16 +69,15 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
         sessionStorage.setItem('hasSeenEmergencyHub', 'true')
     }
 
-    const handleNeedHelp = () => {
+    const handleNeedHelpLocal = () => {
         handleDismissHub()
         onNeedHelp()
     }
 
-    const handleCanHelp = () => {
+    const handleCanHelpLocal = () => {
         handleDismissHub()
         onCanHelp()
     }
-
 
     const [activeFilter, setActiveFilter] = React.useState<string>('total')
 
@@ -105,34 +98,27 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
             .slice(0, 10)
     }, [disasters])
 
-
-
     const handleStatClick = (filter: string) => {
         setActiveFilter(prev => prev === filter ? 'total' : filter)
     }
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen)
-    }
-
     return (
-        <div className="map-dashboard-container" style={{ display: 'flex', height: '100%', width: '100%', position: 'relative' }}>
-            <div className={`sidebar-wrapper ${isSidebarOpen ? 'mobile-open' : ''}`}>
+        <div className="map-dashboard-container flex" style={{ height: '100%', width: '100%', position: 'relative' }}>
+            {/* Desktop Sidebar */}
+            <div className="hidden md:block" style={{ width: '380px', flexShrink: 0 }}>
                 <Sidebar
                     stats={stats}
                     layers={layers}
                     onToggleLayer={onToggleLayer}
                     recentAlerts={recentAlerts}
-                    onAlertClick={(d) => { onDisasterSelect(d); setIsSidebarOpen(false); }}
+                    onAlertClick={(d) => onDisasterSelect(d)}
                     activeFilter={activeFilter}
                     onStatClick={handleStatClick}
                 />
-                <button className="sidebar-close-btn md:hidden" onClick={() => setIsSidebarOpen(false)}>
-                    <span className="material-symbols-outlined">close</span>
-                </button>
             </div>
 
-            <div style={{ flex: 1, position: 'relative' }}>
+            {/* Main Map Content */}
+            <div className="flex-1 relative overflow-hidden">
                 <Suspense fallback={<MapLoading />}>
                     <DisasterMap
                         disasters={disasters}
@@ -144,21 +130,54 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
                     />
                 </Suspense>
 
-                {/* Mobile Sidebar Toggle */}
-                <button
-                    className="mobile-sidebar-toggle md:hidden"
-                    onClick={toggleSidebar}
-                    aria-label="Toggle filters"
-                >
-                    <span className="material-symbols-outlined">filter_list</span>
-                </button>
+                {/* Mobile Floating Stats Summary (Minimalist) */}
+                <div className="md:hidden absolute flex" style={{
+                    top: '1rem',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 1000,
+                    gap: '0.5rem',
+                    width: '90%',
+                    pointerEvents: 'none'
+                }}>
+                    <div className="flex-1 flex flex-col items-center" style={{
+                        background: 'rgba(0,0,0,0.6)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        padding: '0.75rem'
+                    }}>
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', fontWeight: '700', textTransform: 'uppercase' }}>Critical</span>
+                        <span style={{ fontSize: '14px', fontWeight: '900', color: '#f43f5e' }}>{stats.critical}</span>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center" style={{
+                        background: 'rgba(0,0,0,0.6)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        padding: '0.75rem'
+                    }}>
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', fontWeight: '700', textTransform: 'uppercase' }}>Active</span>
+                        <span style={{ fontSize: '14px', fontWeight: '900', color: '#60a5fa' }}>{stats.active}</span>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center" style={{
+                        background: 'rgba(0,0,0,0.6)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        padding: '0.75rem'
+                    }}>
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', fontWeight: '700', textTransform: 'uppercase' }}>Total</span>
+                        <span style={{ fontSize: '14px', fontWeight: '900', color: '#ffffff' }}>{stats.total}</span>
+                    </div>
+                </div>
             </div>
 
             <AnimatePresence>
                 {showHub && (
                     <EmergencyActionHub
-                        onNeedHelp={handleNeedHelp}
-                        onCanHelp={handleCanHelp}
+                        onNeedHelp={handleNeedHelpLocal}
+                        onCanHelp={handleCanHelpLocal}
                         onDismiss={handleDismissHub}
                     />
                 )}

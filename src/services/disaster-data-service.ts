@@ -1,6 +1,8 @@
 import { Disaster, DisasterType, Severity } from '../types'
 import { indianCities } from '../constants/locations'
 import { getStringContent, xmlToObject } from '../utils/xml-utils'
+import { supabase } from '../lib/supabase'
+import { RealtimeChannel } from '@supabase/supabase-js'
 
 // Extract location from text (returns first match)
 function extractLocation(text: string): { name: string; state: string; lat: number; lng: number } | null {
@@ -508,26 +510,115 @@ export async function fetchDisastersFromSACHET(): Promise<Disaster[]> {
 }
 
 
-// Main function to get all disasters from SACHET
+/**
+ * Map DB row to Disaster interface
+ */
+const mapDisasterFromDb = (row: any): Disaster => ({
+  id: row.id,
+  type: row.type as DisasterType,
+  location: {
+    lat: row.lat,
+    lng: row.lng,
+    name: row.location_name || 'Satellite Detected',
+    state: row.state_name || 'India'
+  },
+  severity: row.severity as Severity,
+  description: row.description,
+  reportedAt: row.reported_at,
+  expires: row.expires_at,
+  status: row.status as 'active' | 'contained' | 'resolved',
+  affectedPeople: undefined
+})
+
+/**
+ * Fetch persistent disasters from Supabase (e.g. NASA FIRMS)
+ */
+export async function fetchStoredDisasters(): Promise<Disaster[]> {
+  try {
+    const { data, error } = await supabase
+      .from('disasters')
+      .select('*')
+      .order('reported_at', { ascending: false })
+      .limit(100)
+
+    if (error) {
+      console.error('Error fetching stored disasters:', error)
+      return []
+    }
+
+    return (data || []).map(mapDisasterFromDb)
+  } catch (error) {
+    console.error('Failed to fetch stored disasters:', error)
+    return []
+  }
+}
+
+/**
+ * Subscribe to real-time disaster updates
+ */
+export function subscribeToDisasters(onUpdate: (payload: any) => void): RealtimeChannel {
+  return supabase
+    .channel('public:disasters')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'disasters'
+      },
+      (payload) => {
+        onUpdate(payload);
+      }
+    )
+    .subscribe();
+}
+
+/**
+ * Main function to combine official NDMA RSS alerts with persistent satellite detections
+ */
 export async function fetchAllDisasters(): Promise<Disaster[]> {
-  // Fetch from SACHET
+  // 1. Fetch live alerts from NDMA SACHET
   const sachetDisasters = await fetchDisastersFromSACHET()
 
-  // Combine all disasters (currently just SACHET, will add new FIRMS later if needed here, or handle separately)
-  const allDisasters = [...sachetDisasters]
+  // 2. Fetch persistent detections (Wildfires from NASA FIRMS)
+  const storedDisasters = await fetchStoredDisasters()
 
-  // Remove duplicates (same location + type + date)
-  const uniqueDisasters = allDisasters.filter((disaster, index, self) =>
-    index === self.findIndex(d =>
-      d.id === disaster.id || (
-        Math.abs(d.location.lat - disaster.location.lat) < 0.1 &&
-        Math.abs(d.location.lng - disaster.location.lng) < 0.1 &&
+  // 3. Combine both intelligence sources
+  const allDisasters = [...sachetDisasters, ...storedDisasters]
+
+  // 4. Advanced Normalization & Deduplication
+  // Rules:
+  // - Prefer NDMA (Authoritative) over FIRMS (Ground Truth) if they overlap
+  // - Distance threshold: ~3km (0.03 degrees)
+  // - Time threshold: 4 hours (alerts often stay valid for hours)
+  const uniqueDisasters = allDisasters.filter((disaster, index, self) => {
+    // Check if there is a better candidate earlier in the combined list
+    const betterCandidateIndex = self.findIndex(d => {
+      // Don't compare with self
+      if (d.id === disaster.id) return false
+
+      const isSachet = d.id.startsWith('sachet')
+      const targetIsFirms = disaster.id.startsWith('firms')
+
+      // Rule: If we have a Sachet alert and this is a Firms point in the same area, Sachet wins
+      if (isSachet && targetIsFirms) {
+        const distLat = Math.abs(d.location.lat - disaster.location.lat)
+        const distLng = Math.abs(d.location.lng - disaster.location.lng)
+        if (distLat < 0.03 && distLng < 0.03) return true
+      }
+
+      // Default duplicate Check (same ID or same location+type)
+      return d.id === disaster.id || (
+        Math.abs(d.location.lat - disaster.location.lat) < 0.05 &&
+        Math.abs(d.location.lng - disaster.location.lng) < 0.05 &&
         d.type === disaster.type &&
-        d.reportedAt === disaster.reportedAt
+        Math.abs(new Date(d.reportedAt).getTime() - new Date(disaster.reportedAt).getTime()) < (4 * 60 * 60 * 1000)
       )
-    )
-  )
+    })
 
+    // If a candidate was found earlier (higher priority or earlier in processing), filter this one out
+    return betterCandidateIndex === -1 || betterCandidateIndex > index
+  })
 
   return uniqueDisasters
 }

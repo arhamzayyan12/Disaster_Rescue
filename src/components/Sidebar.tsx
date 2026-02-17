@@ -14,8 +14,9 @@ interface SidebarProps {
         weather: boolean
         disasters: boolean
         shelters: boolean
+        wildfires: boolean
     }
-    onToggleLayer: (layer: 'weather' | 'disasters' | 'shelters') => void
+    onToggleLayer: (layer: 'weather' | 'disasters' | 'shelters' | 'wildfires') => void
     recentAlerts: Disaster[]
     onAlertClick: (disaster: Disaster) => void
     activeFilter: string
@@ -81,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <div className="sidebar-section">
                     <h3>Map Layers</h3>
                     <div className="layer-list">
-                        {(['disasters', 'weather', 'shelters'] as const).map((layer, index) => (
+                        {(['disasters', 'weather', 'shelters', 'wildfires'] as const).map((layer, index) => (
                             <motion.label
                                 key={layer}
                                 initial={{ opacity: 0 }}
@@ -95,7 +96,19 @@ const Sidebar: React.FC<SidebarProps> = ({
                                     checked={layers[layer]}
                                     onChange={() => onToggleLayer(layer)}
                                 />
-                                <p className="layer-text">{layer.charAt(0).toUpperCase() + layer.slice(1)}</p>
+                                <span className="material-symbols-outlined" style={{
+                                    fontSize: '1.2rem',
+                                    color: layer === 'wildfires' ? '#ff5722' :
+                                        layer === 'disasters' ? '#ef4444' :
+                                            layer === 'weather' ? '#3b82f6' : '#10b981'
+                                }}>
+                                    {layer === 'wildfires' ? 'satellite_alt' :
+                                        layer === 'disasters' ? 'emergency' :
+                                            layer === 'weather' ? 'tsunami' : 'hospital'}
+                                </span>
+                                <p className="layer-text">
+                                    {layer === 'wildfires' ? 'Wildfire Intel (NASA)' : layer.charAt(0).toUpperCase() + layer.slice(1)}
+                                </p>
                             </motion.label>
                         ))}
                     </div>

@@ -39,6 +39,7 @@ interface DisasterMapProps {
     weather: boolean
     disasters: boolean
     shelters: boolean
+    wildfires: boolean
   }
   selectedDisaster: Disaster | null
   onDisasterSelect: (disaster: Disaster | null) => void
@@ -65,9 +66,14 @@ const getDisasterIcon = (disaster: Disaster | EnrichedDisaster) => {
     const iconTextColor = isLightBackground ? '#1a1a1a' : 'white';
 
     // Premium Vibrant Style with Pulse Animation
+    // Dynamic Scaling based on Intensity (FRP) for FIRMS
+    const frp = disaster.metadata?.frp || 0;
+    const scale = frp > 100 ? 1.4 : frp > 50 ? 1.2 : 1;
+    const glowColor = frp > 50 ? 'rgba(255, 87, 34, 0.4)' : 'transparent';
+
     const iconHtml = `
-      <div class="marker-wrapper">
-        <div class="marker-pulse marker-pulse-${severity}"></div>
+      <div class="marker-wrapper" style="transform: scale(${scale});">
+        <div class="marker-pulse marker-pulse-${severity}" style="box-shadow: 0 0 20px ${glowColor}"></div>
         <div class="marker-icon-inner" style="
           background: ${typeColor};
           border: 2px solid ${severityColor};
@@ -257,24 +263,29 @@ const DisasterMap: React.FC<DisasterMapProps> = memo(({
   // Filter disasters based on active layers and active filter
   const displayedDisasters = useMemo(() => {
     return enrichedDisasters.filter(d => {
-      // Layer filtering
+      // 1. Layer Visibility Check
+      const isSachet = d.id.startsWith('sachet')
+      const isFirms = d.id.startsWith('firms')
+
       const isWeather = d.severity === 'low' || d.severity === 'medium'
       const isDisaster = d.severity === 'high' || d.severity === 'critical'
 
       let layerVisible = false
-      if (layers.weather && isWeather) layerVisible = true
-      if (layers.disasters && isDisaster) layerVisible = true
+
+      // Authoritative alerts layer
+      if (layers.disasters && isSachet && isDisaster) layerVisible = true
+      // Weather warnings layer
+      if (layers.weather && isSachet && isWeather) layerVisible = true
+      // Satellite intelligence layer (NASA FIRMS)
+      if (layers.wildfires && isFirms) layerVisible = true
 
       if (!layerVisible) return false
 
-      // Active Filter logic
+      // 2. Active Filter logic (Top Level Stats)
       if (activeFilter === 'total') return true
       if (activeFilter === 'critical' && d.severity === 'critical') return true
       if (activeFilter === 'high' && d.severity === 'high') return true
       if (activeFilter === 'active' && d.status === 'active') return true
-
-      // If filter is specific but doesn't match, hide it
-      if (activeFilter !== 'total') return false
 
       return true
     })
@@ -384,15 +395,29 @@ const DisasterMap: React.FC<DisasterMapProps> = memo(({
                 <Popup>
                   <div className="info-window-content">
                     <h3 style={{ borderBottom: `3px solid ${getSeverityColor(disaster.severity)}`, paddingBottom: '5px' }}>
-                      {(disaster as EnrichedDisaster).smartAnalysis?.label || disaster.type.toUpperCase()}
+                      {disaster.source === 'NASA_FIRMS_VIIRS' ? 'Wildfire Detected' : ((disaster as EnrichedDisaster).smartAnalysis?.label || disaster.type.toUpperCase())}
                     </h3>
-                    {(disaster as EnrichedDisaster).smartAnalysis && (
-                      <div style={{ fontSize: '0.8em', color: '#666', marginBottom: '5px' }}>
-                        AI Confidence: {Math.round((disaster as EnrichedDisaster).smartAnalysis.confidence * 100)}%
-                      </div>
-                    )}
+
                     <p><strong>Location:</strong> {disaster.location.name}</p>
+                    <p><strong>Time:</strong> {new Date(disaster.reportedAt).toLocaleString()}</p>
                     <p><strong>Severity:</strong> {disaster.severity.toUpperCase()}</p>
+
+                    {disaster.confidence !== undefined && (
+                      <p><strong>Confidence:</strong> {Math.round(disaster.confidence * 100)}%</p>
+                    )}
+
+                    {disaster.source && (
+                      <p style={{ fontSize: '0.85em', color: '#3b82f6', fontWeight: 'bold' }}>
+                        Source: {disaster.source === 'NASA_FIRMS_VIIRS' ? 'NASA FIRMS' : disaster.source.replace(/_/g, ' ')}
+                      </p>
+                    )}
+
+                    {disaster.metadata?.frp && (
+                      <p style={{ fontSize: '0.85em', color: '#ff5722', fontWeight: 'bold' }}>
+                        Thermal Power: {disaster.metadata.frp} MW
+                      </p>
+                    )}
+
                     <p>{disaster.description.substring(0, 100)}...</p>
                   </div>
                 </Popup>
