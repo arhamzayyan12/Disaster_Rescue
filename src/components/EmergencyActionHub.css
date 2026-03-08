@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(10, 12, 16, 0.85);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(8px);
     z-index: 1000;
     display: flex;
@@ -14,8 +14,8 @@
 }
 
 .emergency-hub-card {
-    background: linear-gradient(145deg, rgba(30, 34, 45, 0.95), rgba(10, 12, 16, 0.98));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 28px;
     width: 100%;
     max-width: 600px;
@@ -86,11 +86,11 @@
     font-family: 'Outfit', sans-serif;
     margin-bottom: 12px;
     letter-spacing: -0.02em;
-    color: white;
+    color: var(--text-primary);
 }
 
 .emergency-hub-header p {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 1.1rem;
     max-width: 40ch;
     margin: 0 auto;
@@ -108,18 +108,18 @@
     align-items: center;
     gap: 24px;
     padding: 28px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 24px;
-    color: white;
+    color: var(--text-primary);
     text-align: left;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .emergency-option-btn:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
 }
 
@@ -140,7 +140,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     overflow: hidden;
     /* Prevent text leakage */
 }

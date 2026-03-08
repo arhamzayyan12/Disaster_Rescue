@@ -1,6 +1,6 @@
 /* Sidebar.css */
 .sidebar {
-  width: 380px;
+  /* Removed fixed width to allow parent-controlled resizability */
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-subtle);
   display: flex;
@@ -51,7 +51,7 @@
 .stat-card:hover {
   transform: translateY(-2px);
   border-color: var(--border-bright);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.02);
   box-shadow: var(--shadow-lg);
 }
 
@@ -120,7 +120,7 @@
 }
 
 .layer-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .layer-checkbox {
@@ -159,7 +159,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.01);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
   cursor: pointer;
@@ -167,7 +167,7 @@
 }
 
 .alert-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.03);
   border-color: var(--border-bright);
   transform: translateX(4px);
 }

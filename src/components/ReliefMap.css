@@ -131,7 +131,7 @@
     bottom: 20px;
     left: 20px;
     right: 20px;
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
     backdrop-filter: blur(12px);
     padding: 24px;
     border-radius: 16px;
@@ -144,7 +144,7 @@
 .route-info-panel h4 {
     margin: 0 0 20px 0;
     font-size: 1.25rem;
-    color: white;
+    color: var(--text-primary);
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -163,14 +163,14 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .route-label {
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -247,7 +247,7 @@
     border: 1px solid var(--border-color);
     max-width: 400px;
     backdrop-filter: blur(12px);
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.98));
 }
 
 .financial-aid-panel .panel-header {
@@ -260,7 +260,7 @@
 .financial-aid-panel h4 {
     margin: 0;
     font-size: 1.25rem;
-    color: var(--text-white);
+    color: var(--text-primary);
     font-weight: 700;
 }
 
@@ -285,12 +285,12 @@
 }
 
 .aid-details strong {
-    color: var(--text-white);
+    color: var(--text-primary);
 }
 
 .upi-id {
     font-family: monospace;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     padding: 4px 8px;
     border-radius: 4px;
     display: inline-block;
@@ -330,7 +330,7 @@
 
 .disclaimer-text {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     text-align: center;
     margin-top: 16px;
     font-style: italic;

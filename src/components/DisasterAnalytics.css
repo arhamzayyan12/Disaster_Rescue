@@ -4,7 +4,7 @@
     padding: 2rem 5%;
     max-width: 1400px;
     margin: 0 auto;
-    color: white;
+    color: var(--text-primary);
     padding-bottom: 4rem;
 }
 
@@ -14,7 +14,7 @@
     align-items: flex-end;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .page-title {
@@ -40,7 +40,7 @@
 }
 
 .kpi-card.premium {
-    background: linear-gradient(135deg, rgba(23, 30, 45, 0.9) 0%, rgba(15, 20, 30, 0.9) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border-bright);
     border-radius: 24px;
@@ -113,7 +113,7 @@
 }
 
 .chart-card.glass {
-    background: rgba(17, 25, 40, 0.6);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border-subtle);
     border-radius: 24px;
@@ -126,7 +126,7 @@
     font-weight: 700;
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .bar-chart-container {
@@ -154,7 +154,7 @@
 .bar-track {
     flex: 1;
     height: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -173,8 +173,8 @@
 
 /* Table Card */
 .table-card {
-    background: rgba(17, 25, 40, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 16px;
     padding: 1.5rem;
 }
@@ -195,12 +195,12 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     font-weight: 600;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .events-table td {
     padding: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     font-size: 0.95rem;
 }
 
@@ -286,11 +286,11 @@
     }
 
     .events-table tr {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(0, 0, 0, 0.03);
         margin-bottom: 1rem;
         border-radius: 12px;
         padding: 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .events-table td {

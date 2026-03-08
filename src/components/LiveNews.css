@@ -19,7 +19,7 @@
     font-weight: 900;
     line-height: 1.1;
     letter-spacing: -0.04em;
-    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -63,7 +63,7 @@
 .news-stat-card:hover {
     transform: translateY(-4px);
     border-color: var(--border-bright);
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .news-stat-label {
@@ -116,14 +116,14 @@
     height: 3.5rem;
     align-items: center;
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.03);
     border: 1px solid var(--border-subtle);
     transition: all 0.3s;
 }
 
 .search-wrapper:focus-within {
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     box-shadow: 0 0 20px var(--accent-glow);
 }
 
@@ -169,12 +169,12 @@
 }
 
 .filter-pill.inactive {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(0, 0, 0, 0.02);
     color: var(--text-secondary);
 }
 
 .filter-pill.inactive:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     border-color: var(--border-bright);
 }
 
@@ -186,7 +186,7 @@
 }
 
 .news-card {
-    background: rgba(17, 25, 40, 0.4);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(20px);
     border-radius: 24px;
     overflow: hidden;
@@ -201,7 +201,7 @@
 .news-card:hover {
     transform: translateY(-4px) scale(1.005);
     border-color: rgba(59, 130, 246, 0.2);
-    background: rgba(17, 25, 40, 0.6);
+    background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
 }
 
@@ -308,7 +308,7 @@
 .view-details-btn {
     height: 2.5rem;
     padding: 0 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     color: var(--text-primary);
     font-weight: 600;
     border-radius: 12px;

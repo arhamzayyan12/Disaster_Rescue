@@ -80,6 +80,34 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
     }
 
     const [activeFilter, setActiveFilter] = React.useState<string>('total')
+    const [sidebarWidth, setSidebarWidth] = React.useState(380)
+    const [isResizing, setIsResizing] = React.useState(false)
+
+    const startResizing = React.useCallback(() => {
+        setIsResizing(true)
+    }, [])
+
+    const stopResizing = React.useCallback(() => {
+        setIsResizing(false)
+    }, [])
+
+    const resize = React.useCallback((e: MouseEvent) => {
+        if (isResizing) {
+            let newWidth = e.clientX
+            if (newWidth < 280) newWidth = 280
+            if (newWidth > 600) newWidth = 600
+            setSidebarWidth(newWidth)
+        }
+    }, [isResizing])
+
+    React.useEffect(() => {
+        window.addEventListener('mousemove', resize)
+        window.addEventListener('mouseup', stopResizing)
+        return () => {
+            window.removeEventListener('mousemove', resize)
+            window.removeEventListener('mouseup', stopResizing)
+        }
+    }, [resize, stopResizing])
 
     // Calculate stats
     const stats = React.useMemo(() => {
@@ -105,7 +133,7 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
     return (
         <div className="map-dashboard-container flex" style={{ height: '100%', width: '100%', position: 'relative' }}>
             {/* Desktop Sidebar */}
-            <div className="hidden md:block" style={{ width: '380px', flexShrink: 0 }}>
+            <div className="hidden md:block" style={{ width: `${sidebarWidth}px`, flexShrink: 0, position: 'relative' }}>
                 <Sidebar
                     stats={stats}
                     layers={layers}
@@ -114,6 +142,22 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
                     onAlertClick={(d) => onDisasterSelect(d)}
                     activeFilter={activeFilter}
                     onStatClick={handleStatClick}
+                />
+                {/* Resize Handle */}
+                <div
+                    onMouseDown={startResizing}
+                    style={{
+                        position: 'absolute',
+                        right: '-3px',
+                        top: 0,
+                        bottom: 0,
+                        width: '6px',
+                        cursor: 'col-resize',
+                        zIndex: 50,
+                        transition: 'background 0.2s',
+                        background: isResizing ? 'var(--primary)' : 'transparent'
+                    }}
+                    className="hover:bg-primary/30"
                 />
             </div>
 
@@ -127,6 +171,7 @@ const MapDashboard: React.FC<MapDashboardProps> = ({
                         onDisasterSelect={onDisasterSelect}
                         onToggleShelterLayer={() => onToggleLayer('shelters')}
                         activeFilter={activeFilter}
+                        sidebarWidth={sidebarWidth}
                     />
                 </Suspense>
 

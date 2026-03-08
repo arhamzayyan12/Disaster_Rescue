@@ -1,8 +1,8 @@
 .skeleton {
     background: linear-gradient(90deg,
-            rgba(255, 255, 255, 0.05) 25%,
-            rgba(255, 255, 255, 0.1) 37%,
-            rgba(255, 255, 255, 0.05) 63%);
+            rgba(0, 0, 0, 0.05) 25%,
+            rgba(0, 0, 0, 0.1) 37%,
+            rgba(0, 0, 0, 0.05) 63%);
     background-size: 400% 100%;
     animation: skeleton-loading 1.4s ease infinite;
     position: relative;
@@ -36,8 +36,8 @@
 /* Glassmorphism adjustment if background is dark */
 .glass-panel .skeleton {
     background: linear-gradient(90deg,
-            rgba(255, 255, 255, 0.03) 25%,
-            rgba(255, 255, 255, 0.08) 37%,
-            rgba(255, 255, 255, 0.03) 63%);
+            rgba(0, 0, 0, 0.03) 25%,
+            rgba(0, 0, 0, 0.08) 37%,
+            rgba(0, 0, 0, 0.03) 63%);
     background-size: 400% 100%;
 }

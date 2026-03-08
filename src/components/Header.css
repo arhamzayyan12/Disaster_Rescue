@@ -112,12 +112,12 @@
 }
 
 .header-login-btn.logout {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     border: 1px solid var(--border-bright);
 }
 
 .header-login-btn.logout:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .header-logout-btn {
@@ -128,7 +128,7 @@
     height: 32px;
     border-radius: 8px;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s;
@@ -147,7 +147,7 @@
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     border: 1px solid var(--border-subtle);
     color: var(--text-white);
     cursor: pointer;
@@ -156,7 +156,7 @@
 
 .mobile-menu-toggle:active {
     transform: scale(0.9);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .user-profile {
@@ -197,7 +197,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(0, 0, 0, 0.1);
     object-fit: cover;
 }
 
@@ -279,7 +279,7 @@
         width: 100%;
         padding: 1rem 1.5rem;
         text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .active-tab-indicator {

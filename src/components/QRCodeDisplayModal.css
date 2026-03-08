@@ -17,7 +17,7 @@
 }
 
 .qr-display-modal-content {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border-radius: 20px;
     max-width: 600px;
     width: 100%;
@@ -26,7 +26,7 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
     position: relative;
     animation: slideUp 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* Header */
@@ -35,20 +35,20 @@
     justify-content: space-between;
     align-items: flex-start;
     padding: 24px 28px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     background: rgba(33, 150, 243, 0.05);
 }
 
 .qr-display-modal-header h2 {
     font-size: 24px;
     font-weight: 600;
-    color: white;
+    color: var(--text-primary);
     margin: 0 0 4px;
 }
 
 .request-victim-name {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     margin: 0;
 }
 
@@ -57,8 +57,8 @@
     height: 40px;
     border-radius: 50%;
     border: none;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-secondary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -68,15 +68,15 @@
 }
 
 .qr-display-modal-close:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.2);
     transform: rotate(90deg);
 }
 
 /* Request Details */
 .qr-display-request-details {
     padding: 24px 28px;
-    background: rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .detail-row {
@@ -98,13 +98,13 @@
 
 .detail-label {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);
     font-weight: 500;
 }
 
 .detail-value {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
     font-weight: 500;
 }
 
@@ -142,7 +142,7 @@
 
 .detail-description {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     line-height: 1.6;
     margin: 0;
 }
@@ -170,13 +170,13 @@
 
 .qr-display-instructions p {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-secondary);
     margin: 0;
     line-height: 1.5;
 }
 
 .qr-display-image-container {
-    background: white;
+    background: #f8fafc;
     padding: 24px;
     border-radius: 16px;
     display: flex;
@@ -221,7 +221,7 @@
 
 .upi-id-text {
     font-size: 15px;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
     font-weight: 500;
     font-family: 'Courier New', monospace;
 }
@@ -248,13 +248,13 @@
 }
 
 .qr-display-btn.secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .qr-display-btn.secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -298,7 +298,7 @@
 
 .disclaimer-text {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
 }
@@ -329,7 +329,7 @@
 /* Footer */
 .qr-display-modal-footer {
     padding: 20px 28px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: flex-end;
 }

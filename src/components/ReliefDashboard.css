@@ -43,7 +43,7 @@
     height: 3.5rem;
     width: 100%;
     max-width: 400px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.03);
     border: 1px solid var(--border-subtle);
     border-radius: 18px;
     padding: 0.35rem;
@@ -118,36 +118,36 @@
     flex-direction: column;
     align-items: center;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(0, 0, 0, 0.02);
     border: 1px solid var(--border-subtle);
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s;
-    color: #ffffff;
+    color: var(--text-primary);
 }
 
 .need-card:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .need-card.selected {
     background: rgba(59, 130, 246, 0.1);
     border-color: var(--primary);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
-    color: #ffffff;
+    color: var(--primary);
 }
 
 .need-icon {
     font-size: 2.5rem;
     margin-bottom: 0.75rem;
-    color: #ffffff;
+    color: var(--text-secondary);
     transition: color 0.2s;
 }
 
 .need-label {
     font-size: 1rem;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--text-primary);
 }
 
 .need-card.selected .need-icon {
@@ -159,11 +159,11 @@
 .text-input,
 .textarea-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.03);
     border: 1px solid var(--border-subtle);
     border-radius: 12px;
     padding: 1rem;
-    color: white;
+    color: var(--text-primary);
     font-family: inherit;
     transition: all 0.2s;
 }
@@ -259,7 +259,7 @@
     height: 2.5rem;
     padding: 0 1.5rem;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.03);
     color: var(--text-secondary);
     border: 1px solid var(--border-subtle);
     cursor: pointer;
@@ -279,7 +279,7 @@
 }
 
 .requests-table th {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.03);
     padding: 1.25rem;
     text-transform: uppercase;
     font-size: 0.75rem;
@@ -365,9 +365,9 @@
     gap: 2rem;
     margin: 1.5rem 0;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .trust-item {
@@ -401,8 +401,8 @@
 .impact-section {
     margin-top: 4rem;
     padding: 2rem;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), transparent);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.02), transparent);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
     text-align: center;
 }
 
@@ -421,9 +421,9 @@
 
 .impact-card {
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .impact-card.active {
@@ -516,7 +516,7 @@
     }
 
     .requests-table tr {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(0, 0, 0, 0.03);
         margin-bottom: 1rem;
         border-radius: 16px;
         padding: 1rem;

@@ -4,11 +4,11 @@ import MapDashboard from './components/MapDashboard'
 import AuthModal from './components/AuthModal'
 import NewsTicker from './components/NewsTicker'
 import { Disaster } from './types'
-
 import { fetchAllDisasters, subscribeToDisasters } from './services/disaster-data-service'
 import { FirmsIngestionService } from './services/firms-service'
 import { Analytics } from '@vercel/analytics/react'
 import { ReliefProvider } from './contexts/ReliefContext'
+import BottomNav from './components/BottomNav'
 import './App.css'
 
 // Lazy load heavy components
@@ -25,7 +25,12 @@ const LoadingSpinner = () => (
   </div>
 )
 
-import BottomNav from './components/BottomNav'
+interface LayersState {
+  weather: boolean
+  disasters: boolean
+  shelters: boolean
+  wildfires: boolean
+}
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('map')
@@ -35,15 +40,15 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [reliefMode, setReliefMode] = useState<'victim' | 'volunteer' | undefined>()
 
-  const [layers, setLayers] = useState({
+  const [layers, setLayers] = useState<LayersState>({
     weather: true,
     disasters: true,
     shelters: false,
     wildfires: true
   })
 
-  const handleToggleLayer = useCallback((layer: 'weather' | 'disasters' | 'shelters' | 'wildfires') => {
-    setLayers(prev => ({ ...prev, [layer]: !prev[layer] }))
+  const handleToggleLayer = useCallback((layer: keyof LayersState) => {
+    setLayers((prev) => ({ ...prev, [layer]: !prev[layer] }))
   }, [])
 
   const handleTabChange = useCallback((tab: TabType) => {
@@ -73,15 +78,13 @@ function App() {
   }, [])
 
   const handleNewsDisasterSelect = useCallback((disaster: Disaster) => {
-    // Validate coordinates before selecting disaster
     const lat = disaster.location.lat
     const lng = disaster.location.lng
 
     if (!isNaN(lat) && !isNaN(lng) && isFinite(lat) && isFinite(lng)) {
       setSelectedDisaster(disaster)
       setActiveTab('map')
-      // Auto-enable shelters layer when selecting from news
-      setLayers(prev => ({ ...prev, shelters: true }))
+      setLayers((prev) => ({ ...prev, shelters: true }))
     } else {
       console.error('Cannot navigate to disaster with invalid coordinates:', disaster)
       alert('Unable to show this location on the map. The coordinates are invalid.')
@@ -91,13 +94,11 @@ function App() {
   const handleTickerDisasterSelect = useCallback((disaster: Disaster) => {
     setSelectedDisaster(disaster)
     setActiveTab('map')
-    setLayers(prev => ({ ...prev, shelters: true }))
+    setLayers((prev) => ({ ...prev, shelters: true }))
   }, [])
 
-  // User location
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | undefined>()
 
-  // Get user location
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -109,17 +110,14 @@ function App() {
         },
         (error) => {
           console.warn('Could not get user location:', error)
-          // Default to India center
           setUserLocation({ lat: 20.5937, lng: 78.9629 })
         }
       )
     } else {
-      // Default to India center
       setUserLocation({ lat: 20.5937, lng: 78.9629 })
     }
   }, [])
 
-  // Track if relief tab has been loaded
   const [reliefLoaded, setReliefLoaded] = useState(false)
 
   useEffect(() => {
@@ -128,7 +126,6 @@ function App() {
     }
   }, [activeTab, reliefLoaded])
 
-  // Fetch data
   const fetchData = useCallback(async () => {
     setIsLoading(true)
     try {
@@ -143,26 +140,19 @@ function App() {
     }
   }, [])
 
-  // Auto-refresh & Real-time Sync
   useEffect(() => {
     fetchData()
-
-    // 1. Subscribe to real-time database changes (Triggered by FIRMS or Admin)
-    const subscription = subscribeToDisasters((payload) => {
-      console.log('🌍 Real-time Disaster Sync:', payload.eventType)
-      fetchData() // Simple re-fetch for UI consistency
+    const subscription = subscribeToDisasters(() => {
+      fetchData()
     })
 
-    // 2. NASA FIRMS Periodic Ingestion
-    // Note: In production, this poller should run in a backend worker/Edge Function.
-    // We implement it here to satisfy the "Autonomous Intelligence" requirement for the demo.
     const runFirmsIngest = () => {
       FirmsIngestionService.ingestWildfireData()
     }
 
-    runFirmsIngest() // Initial run
-    const firmsInterval = setInterval(runFirmsIngest, 15 * 60 * 1000) // Every 15 mins
-    const dataInterval = setInterval(fetchData, 600000) // Every 10 mins
+    runFirmsIngest()
+    const firmsInterval = setInterval(runFirmsIngest, 15 * 60 * 1000)
+    const dataInterval = setInterval(fetchData, 600000)
 
     return () => {
       subscription.unsubscribe()
@@ -184,7 +174,6 @@ function App() {
 
         {!showAuthModal && (
           <main className={`main-content ${['news', 'analytics', 'relief'].includes(activeTab) ? 'scrollable' : ''}`}>
-            {/* Map View - Keep outside Suspense to prevent unmounting/remounting issues */}
             <div className={activeTab === 'map' ? 'flex-1 flex' : 'hidden'} style={{ height: '100%', width: '100%' }}>
               <MapDashboard
                 disasters={disasters}
@@ -197,7 +186,6 @@ function App() {
               />
             </div>
 
-            {/* Relief View - Keep alive after first load */}
             <div style={{ display: activeTab === 'relief' ? 'block' : 'none', height: '100%', width: '100%' }}>
               {(activeTab === 'relief' || reliefLoaded) && (
                 <Suspense fallback={<LoadingSpinner />}>
@@ -207,17 +195,12 @@ function App() {
             </div>
 
             <Suspense fallback={<LoadingSpinner />}>
-              {/* Analytics View */}
               {activeTab === 'analytics' && (
                 <DisasterAnalytics disasters={disasters} />
               )}
-
-              {/* Guidelines View */}
               {activeTab === 'guidelines' && (
                 <SafetyGuidelines />
               )}
-
-              {/* News View */}
               {activeTab === 'news' && (
                 <LiveNews
                   disasters={disasters}
@@ -229,14 +212,12 @@ function App() {
           </main>
         )}
 
-        {/* Auth Modal */}
         <AuthModal
           isOpen={showAuthModal}
           onClose={handleAuthModalClose}
           initialMode="login"
         />
 
-        {/* Global Intel Ticker - Modified to sit above bottom nav on mobile */}
         {!showAuthModal && (
           <NewsTicker
             disasters={disasters}
@@ -244,7 +225,6 @@ function App() {
           />
         )}
 
-        {/* Mobile Bottom Navigation */}
         {!showAuthModal && (
           <BottomNav
             activeTab={activeTab}
@@ -253,9 +233,8 @@ function App() {
           />
         )}
 
-        {/* Vercel Analytics */}
         <Analytics />
-      </div >
+      </div>
     </ReliefProvider>
   )
 }

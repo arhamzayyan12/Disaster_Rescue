@@ -45,6 +45,7 @@ interface DisasterMapProps {
   onDisasterSelect: (disaster: Disaster | null) => void
   onToggleShelterLayer: () => void
   activeFilter: string
+  sidebarWidth?: number
 }
 
 // --- OPTIMIZATION: Icon Caching & Helpers defined outside component ---
@@ -197,7 +198,7 @@ const createShelterIcon = (amenity?: string) => getShelterIcon(amenity);
 
 
 // Component to handle map view updates
-function MapUpdater({ center, zoom }: { center: [number, number] | null, zoom: number }) {
+function MapUpdater({ center, zoom, sidebarWidth }: { center: [number, number] | null, zoom: number, sidebarWidth?: number }) {
   const map = useMap()
 
   useEffect(() => {
@@ -216,11 +217,11 @@ function MapUpdater({ center, zoom }: { center: [number, number] | null, zoom: n
         console.warn('Invalid coordinates detected, skipping map navigation:', { lat, lng })
       }
     }
-    // Ensure map renders correctly
+    // Ensure map renders correctly when size or location changes
     setTimeout(() => {
       map.invalidateSize()
-    }, 100)
-  }, [center, zoom, map])
+    }, 50)
+  }, [center, zoom, map, sidebarWidth])
 
   return null
 }
@@ -231,7 +232,8 @@ const DisasterMap: React.FC<DisasterMapProps> = memo(({
   selectedDisaster,
   onDisasterSelect,
   onToggleShelterLayer,
-  activeFilter
+  activeFilter,
+  sidebarWidth
 }) => {
   const [showWindMap, setShowWindMap] = useState(false)
   const { requests } = useRelief()
@@ -370,6 +372,7 @@ const DisasterMap: React.FC<DisasterMapProps> = memo(({
           <MapUpdater
             center={mapCenter}
             zoom={selectedDisaster ? 9 : defaultZoom}
+            sidebarWidth={sidebarWidth}
           />
 
           {displayedDisasters
